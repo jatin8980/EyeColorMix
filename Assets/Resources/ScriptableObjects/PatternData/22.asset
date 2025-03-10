@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f5ddb0cae4f47549bdb369051d190b4, type: 3}
+  m_Name: 22
+  m_EditorClassIdentifier: 
+  patternSprites:
+  - {fileID: 21300000, guid: 564719b66ae7c964f99f189ccf7f8d38, type: 3}
+  - {fileID: 21300000, guid: a5ff423d43ebb6545b059c449699eadf, type: 3}
+  patternSize:
+  - {x: 400, y: 400}
+  - {x: 430, y: 405}
+  patternBottom:
+  - 0
+  - 0
+  minSliderValue: 8
+  maxSliderValue: 28
+  defaultValue: 8
+  stretchWidth: 0
