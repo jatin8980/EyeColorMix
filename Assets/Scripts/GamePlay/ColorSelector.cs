@@ -1,10 +1,12 @@
 using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ColorSelector : MonoBehaviour
 {
-    [SerializeField] private Image colorChooseImg, currentChoosedColorImg, borderImage, colorChangeAnimImage;
+    [SerializeField] private Image colorChooseImg, currentChoosedColorImg, borderImage, colorNameBgImage;
+    [SerializeField] private TextMeshProUGUI colorNameText;
     private RectTransform colorChooseRT, currentChoosedColorRT;
     internal bool isFingerOnColorChooseImage, isColorChoosed;
     private Texture2D colorChooseTexture;
@@ -12,7 +14,7 @@ public class ColorSelector : MonoBehaviour
     {
         currentChoosedColorImg.gameObject.SetActive(false);
         currentChoosedColorImg.color = GameManager.Inst.gamePlayUi.drawController.alreadyDrawColor;
-        borderImage.color = Color.white;
+        borderImage.color = colorNameBgImage.color = Color.white;
     }
 
     private void Start()
@@ -40,14 +42,28 @@ public class ColorSelector : MonoBehaviour
                 currentChoosedColorRT.anchoredPosition = anchorPos;
             }
             anchorPos = currentChoosedColorRT.anchoredPosition;
-
             GameManager.Inst.gamePlayUi.pencilController.targetPos = currentChoosedColorRT.position;
             GameManager.Inst.gamePlayUi.pencilController.targetPos.z = 90f;
             GameManager.Inst.gamePlayUi.pencilController.smoothTargetPos = GameManager.Inst.gamePlayUi.pencilController.targetPos;
             int x = Mathf.FloorToInt(colorChooseTexture.width * (anchorPos.x - (-colorChooseRT.rect.width / 2)) / colorChooseRT.rect.width);
             int y = Mathf.FloorToInt(colorChooseTexture.width * (anchorPos.y - (-colorChooseRT.rect.height / 2)) / colorChooseRT.rect.height);
-            currentChoosedColorImg.color = colorChooseTexture.GetPixel(x, y);
+            currentChoosedColorImg.color = colorNameBgImage.color = colorChooseTexture.GetPixel(x, y);
+            SetBorderColor(currentChoosedColorImg.color);
             isColorChoosed = true;
+
+            ColorTextObSetActive(false);
+            foreach (ColorDetail colorDetail in GeneralDataManager.Inst.colorDetails)
+            {
+                ColorUtility.TryParseHtmlString(colorDetail.hex, out Color cl);
+                if (Mathf.Abs(currentChoosedColorImg.color.r - cl.r) < 0.05f &&
+                    Mathf.Abs(currentChoosedColorImg.color.g - cl.g) < 0.05f &&
+                    Mathf.Abs(currentChoosedColorImg.color.b - cl.b) < 0.05f)
+                {
+                    colorNameText.text = colorDetail.subtitle;
+                    ColorTextObSetActive(isFingerOnColorChooseImage);
+                    break;
+                }
+            }
         }
 
         if (Input.GetMouseButtonUp(0))
@@ -57,19 +73,20 @@ public class ColorSelector : MonoBehaviour
                 isFingerOnColorChooseImage = false;
                 currentChoosedColorImg.gameObject.SetActive(false);
                 GameManager.Inst.gamePlayUi.pencilController.MovePencilToDefaultPos();
-                colorChangeAnimImage.DOKill();
-                colorChangeAnimImage.DOFade(1, 0.2f).OnComplete(() =>
-                {
-                    borderImage.color = currentChoosedColorImg.color;
-                    colorChangeAnimImage.DOFade(0, 0.2f);
-                });
-
                 if (GeneralDataManager.TutorialStep == 2 && UserTutorialController.Inst == null)
                 {
                     GameManager.Inst.Show_Popup(GameManager.Popups.TutorialPopUp);
                 }
             }
         }
+    }
+
+    internal void SetBorderColor(Color color) => borderImage.color = color;
+
+    internal void ColorTextObSetActive(bool active)
+    {
+        colorNameBgImage.gameObject.SetActive(active);
+        colorNameText.gameObject.SetActive(active);
     }
 
     internal void SetImage(Sprite sprite)
@@ -80,6 +97,8 @@ public class ColorSelector : MonoBehaviour
 
     internal Color GetSelectedColor() => currentChoosedColorImg.color;
 
+    internal void SetSelectedColor(Color color) => currentChoosedColorImg.color = color;
+
     public void On_Color_Choose_Img_Down(bool isFromTutorial)
     {
         if (UserTutorialController.Inst != null && !isFromTutorial && GeneralDataManager.TutorialStep == 1)
@@ -89,10 +108,10 @@ public class ColorSelector : MonoBehaviour
         }
         if (GameManager.Inst.gamePlayUi.currentStepCount <= 1)
         {
-
             isFingerOnColorChooseImage = !isFromTutorial;
             currentChoosedColorImg.gameObject.SetActive(true);
             GameManager.Inst.gamePlayUi.pencilController.MovePencilToTargetPos();
+            ColorTextObSetActive(!isFromTutorial);
         }
     }
 }

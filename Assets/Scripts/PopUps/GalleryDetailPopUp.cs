@@ -38,12 +38,8 @@ public class GalleryDetailPopUp : MonoBehaviour
         tex.ReadPixels(rex, 0, 0);
         tex.Apply();
         zoomIcon.transform.parent.gameObject.SetActive(true);
-
-        string ShareMessage = "👁️✨ Unleash your creativity and color the world!" +
-            " 🎮 In this mind-bending game, mix and match lenses of all colors to customize character’s eyes!" +
-            " 😎💡 Will you make the perfect combination?\nDownload Now!" +
-                       "\n\nAndroid : " + GeneralDataManager.androidShareLink;
-        new NativeShareLink().AddFile(tex, Application.productName + ".png").SetText(ShareMessage).Share();
+        AdsManager.Inst.CanShowAppOpen = false;
+        new NativeShareLink().AddFile(tex, Application.productName + ".png").SetText(GeneralDataManager.Inst.ShareMessage).Share();
     }
 
     internal void SetThis(Sprite sprite, int index)
@@ -61,7 +57,6 @@ public class GalleryDetailPopUp : MonoBehaviour
         {
             colorsImage[i].color = colorsUsed[i];
         }
-        GameManager.Inst.SetCoinParentAbovePopUp(false);
     }
 
     public void On_Close_Btn_Click()

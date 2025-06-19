@@ -45,10 +45,10 @@ public class ATT_Controller : MonoBehaviour
         else
         {
             CheckTrackingResponse();
-            GameManager.Inst.Show_Screen(GameManager.Screens.Launch);
+            //GameManager.Inst.Show_Screen(GameManager.Screens.Launch);
         }
 #else
-        GameManager.Inst.Show_Screen(GameManager.Screens.Launch);
+        //GameManager.Inst.Show_Screen(GameManager.Screens.Launch);
 #endif
     }
 
@@ -86,7 +86,7 @@ public class ATT_Controller : MonoBehaviour
         }
         CheckTrackingResponse();
 #endif
-        GameManager.Inst.Show_Screen(GameManager.Screens.Launch);
+        //GameManager.Inst.Show_Screen(GameManager.Screens.Launch);
         yield return null;
     }
 }

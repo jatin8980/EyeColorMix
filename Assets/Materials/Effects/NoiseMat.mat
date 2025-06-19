@@ -50,7 +50,7 @@ Material:
     - _FluidAmplitude: 0.1
     - _FluidSpeed: 1
     - _NoiseScale: 0.1
-    - _NoiseStrength: 0.125
+    - _NoiseStrength: 0
     - _Radius: 0.5
     - _RandomSeed: 0
     - _Range: 0
@@ -70,3 +70,4 @@ Material:
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1

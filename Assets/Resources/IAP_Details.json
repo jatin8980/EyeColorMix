@@ -1,4 +1,25 @@
 {
+    "coinspack1": {
+        "price": "$3.99",
+        "packName": "Hot Pack",
+        "rewards": {
+            "coin": 1320
+        }
+    },
+    "coinspack2": {
+        "price": "$7.99",
+        "packName": "Super Pack",
+        "rewards": {
+            "coin": 2880
+        }
+    },
+      "coinspack3": {
+        "price": "$12.99",
+        "packName": "Mega Pack",
+        "rewards": {
+            "coin": 6240
+        }
+    },
     "eyecolormix.removeads": {
         "price": "$4.99",
         "packName": "Null",

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,31 +11,38 @@ public class LevelComplete : MonoBehaviour
 {
     [SerializeField]
     private RectTransform pupilRewardRT, patternRewardRT, effectRewardRT, highlightRewardRT,
-        pupilRewardParent, patternRewardParent, effectRewardParent, highlightRewardParent,
+        pupilRewardParent, patternRewardParent, effectRewardParent, highlightRewardParent, particleRewardParent,
         reward1RT, reward2RT, reward3RT, reward4RT, coinPrefabRT, giftOutPosRT, pathMiddlePointRt, glowsParentRT, doubleRewardParentRt;
     [SerializeField] private Image titleImage;
     [SerializeField] private GameObject rewardsOb;
     [SerializeField] private TextMeshProUGUI rewardAmountText, rewardsTitleText, nextBtnText;
-    [SerializeField] private Text giftSliderText;
+    [SerializeField] private Text giftSliderText, doubleRewardAmountText;
     [SerializeField] private Slider giftSlider;
     [SerializeField] private Animation giftAnim;
+    [SerializeField] private List<Sprite> titleSprites;
+    [SerializeField] private FireCracker fireCracker;
+    private List<Coroutine> coroutinesToStop = new();
     private int nextRewardLevel = int.MaxValue, rewardAmount, previousRewardLevel = 1, currentLevel;
     private bool isZoomIn;
+    private List<int> initialUnlockedParticles = new();
 
     private void Start()
     {
-        AdsManager.Inst.RequestAndLoadInterstitialAd();
+        if ((GeneralDataManager.Level - 1) % 3 == 0)
+            AdsManager.Inst.RequestRewardInterstitial();
+        else
+            AdsManager.Inst.RequestAndLoadInterstitialAd();
         SoundManager.Inst.Play("LevelComplete");
-        GameManager.Inst.SetCoinParentAbovePopUp(true);
-
+        titleImage.sprite = titleSprites[Random.Range(0, titleSprites.Count)];
         rewardAmount = 25 + ((GeneralDataManager.Level - 2) * 10);
         if (rewardAmount > 195)
         {
             rewardAmount = 195 + (Random.Range(1, 8) * 5);
         }
+        fireCracker.yStart = titleImage.transform.parent.position.y;
         GeneralDataManager.Coins += rewardAmount;
-        rewardAmountText.text = "+" + rewardAmount.ToString();
-
+        rewardAmountText.text = "+" + rewardAmount;
+        doubleRewardAmountText.text = "Get " + (rewardAmount * 2);
         rewardsOb.SetActive(false);
         rewardsOb.GetComponent<Image>().DOFade(0, 0);
         giftAnim.enabled = false;
@@ -77,6 +85,19 @@ public class LevelComplete : MonoBehaviour
                     nextRewardLevel = GeneralDataManager.Inst.levelNeededToUnlockHighlight[i];
                 break;
             }
+        }
+        initialUnlockedParticles = GeneralDataManager.UnlockedClickParticleIndexes;
+        List<int> unlockedParticles = GeneralDataManager.UnlockedClickParticleIndexes;
+        if (!(unlockedParticles.Contains(0) && unlockedParticles.Contains(2)))
+        {
+            nextRewardLevel = 2;
+            if (!unlockedParticles.Contains(0))
+                unlockedParticles.Add(0);
+            if (!unlockedParticles.Contains(2))
+                unlockedParticles.Add(2);
+            GeneralDataManager.UnlockedClickParticleIndexes = unlockedParticles;
+            GeneralDataManager.SelectedClickParticleIndex = 0;
+            GameManager.Inst.SetSelectedClickParticle();
         }
 
 
@@ -146,6 +167,14 @@ public class LevelComplete : MonoBehaviour
         }
     }
 
+    private void OnDestroy()
+    {
+        foreach (Coroutine coroutine in coroutinesToStop)
+        {
+            GameManager.Inst.StopCoroutine(coroutine);
+        }
+    }
+
     //used in aniamtion
     private void GiftSliderFill()
     {
@@ -160,6 +189,37 @@ public class LevelComplete : MonoBehaviour
     private void CollectCoins()
     {
         GameManager.Inst.StartCoroutine(CollectCoinsCoroutine());
+    }
+
+    private void PlayTitleAnim()
+    {
+        titleImage.GetComponent<Animation>().Play();
+    }
+
+    private IEnumerator ScrollItems(Transform itemParent)
+    {
+        int totalItems = itemParent.childCount - 1;
+
+        while (true)
+        {
+            yield return new WaitForSeconds(2f);
+            CanvasGroup cg = itemParent.GetChild(totalItems - 1).GetComponent<CanvasGroup>();
+            cg.transform.DOScale(0, 0.5f);
+            cg.DOFade(0, 0.3f).SetDelay(0.2f);
+            for (int i = totalItems - 2; i >= 0; i--)
+            {
+                RectTransform rt = itemParent.GetChild(i).GetComponent<RectTransform>();
+                rt.DOAnchorPos(new Vector2(rt.anchoredPosition.x - 20, rt.anchoredPosition.y - 10), 0.5f);
+            }
+
+            yield return new WaitForSeconds(0.5f);
+            itemParent.GetChild(totalItems - 1).SetAsFirstSibling();
+            itemParent.GetChild(0).GetComponent<RectTransform>().anchoredPosition = new Vector2((totalItems - 1) * 20, (totalItems - 1) * 10);
+            cg.DOKill();
+            cg.alpha = 1;
+            cg.transform.DOScale(1, 0.5f).SetEase(Ease.OutBack);
+            yield return new WaitForSeconds(0.5f);
+        }
     }
 
     private IEnumerator CollectCoinsCoroutine()
@@ -198,7 +258,6 @@ public class LevelComplete : MonoBehaviour
             Destroy(GameManager.Inst.homeScreen.rightEyeParent.GetChild(1).gameObject);
         }
         GetComponent<Animation>().enabled = false;
-        GameManager.Inst.SetCoinParentAbovePopUp(false);
         titleImage.DOFade(0, 0.3f);
         giftSlider.transform.DOScale(0, 0.3f);
         rewardAmountText.transform.parent.DOScale(0, 0.3f);
@@ -208,7 +267,7 @@ public class LevelComplete : MonoBehaviour
         nextBtnText.color = new Color(nextBtnText.color.r, nextBtnText.color.g, nextBtnText.color.b, 0);
         nextBtnText.text = "Great";
         rewardsTitleText.DOFade(1, 0.3f);
-        rewardsOb.GetComponent<Image>().DOFade(0.7f, 0.3f);
+        rewardsOb.GetComponent<Image>().DOFade(0.86f, 0.3f);
         giftAnim.transform.parent.localScale = new(0.25f, 0.25f, 0.25f);
         giftSlider.transform.GetChild(1).gameObject.SetActive(false);
         giftAnim.transform.parent.position = giftSlider.transform.GetChild(1).position;
@@ -232,6 +291,7 @@ public class LevelComplete : MonoBehaviour
         if (rewardCount > 1)
         {
             pupilRewardParent.GetChild(pupilRewardParent.childCount - 1).GetChild(0).GetComponent<TextMeshProUGUI>().text = "Pupils";
+            coroutinesToStop.Add(GameManager.Inst.StartCoroutine(ScrollItems(pupilRewardParent)));
         }
 
 
@@ -248,6 +308,7 @@ public class LevelComplete : MonoBehaviour
         if (rewardCount > 1)
         {
             patternRewardParent.GetChild(patternRewardParent.childCount - 1).GetChild(0).GetComponent<TextMeshProUGUI>().text = "Patterns";
+            coroutinesToStop.Add(GameManager.Inst.StartCoroutine(ScrollItems(patternRewardParent)));
         }
 
         rewardCount = 0;
@@ -263,6 +324,7 @@ public class LevelComplete : MonoBehaviour
         if (rewardCount > 1)
         {
             effectRewardParent.GetChild(effectRewardParent.childCount - 1).GetChild(0).GetComponent<TextMeshProUGUI>().text = "Effects";
+            coroutinesToStop.Add(GameManager.Inst.StartCoroutine(ScrollItems(effectRewardParent)));
         }
 
         rewardCount = 0;
@@ -279,6 +341,7 @@ public class LevelComplete : MonoBehaviour
         if (rewardCount > 1)
         {
             highlightRewardParent.GetChild(highlightRewardParent.childCount - 1).GetChild(0).GetComponent<TextMeshProUGUI>().text = "Highlights";
+            coroutinesToStop.Add(GameManager.Inst.StartCoroutine(ScrollItems(highlightRewardParent)));
         }
 
 
@@ -347,9 +410,36 @@ public class LevelComplete : MonoBehaviour
             }
         }
 
+        if (GeneralDataManager.Level == 2)
+        {
+            childIndex = 0;
+            particleRewardParent.gameObject.SetActive(true);
+            nextBtnText.text = "View";
+            if (!initialUnlockedParticles.Contains(0) && !initialUnlockedParticles.Contains(2))
+                rewardPosRT = reward2RT;
+            List<int> toUnlockParticle = new() { 0, 2 };
+            for (int i = 0; i <= 1; i++)
+            {
+                Transform particleItem = particleRewardParent.GetChild(i);
+                if (initialUnlockedParticles.Contains(toUnlockParticle[i]))
+                {
+                    particleItem.gameObject.SetActive(false);
+                    continue;
+                }
+                path[1] = rewardPosRT.GetChild(childIndex).position;
+                childIndex++;
+                particleItem.position = giftOutPosRT.position;
+                particleItem.localScale = Vector3.zero;
+                particleItem.DOScale(1, 1f).SetEase(Ease.OutBack).SetDelay(childIndex * 0.2f);
+                particleItem.DOPath(path, 1f, PathType.CatmullRom).SetEase(Ease.OutCirc).SetDelay(childIndex * 0.2f);
+                glowsParentRT.GetChild(i).position = path[1];
+                glowsParentRT.GetChild(i).GetComponent<Image>().DOFade(0.78f, 0.3f).SetDelay(childIndex * 0.2f + 1f);
+            }
+        }
+
         yield return new WaitForSeconds(((rewardPosRT.childCount - 1) * 0.2f) + 1f);
         nextBtnText.transform.parent.gameObject.SetActive(true);
-        nextBtnText.DOFade(1, 0.2f);
+        nextBtnText.DOFade(0.88f, 0.2f);
     }
 
     private void InstantiateReward(RectTransform prefabRT, RectTransform parent, int rewardCount, Sprite sprite)
@@ -369,38 +459,54 @@ public class LevelComplete : MonoBehaviour
     {
         GeneralDataManager.Coins += rewardAmount;
         rewardAmountText.text = "+" + (rewardAmount * 2).ToString();
-        CollectCoins();
         doubleRewardParentRt.gameObject.SetActive(false);
+        RectTransform rewardsRT = rewardAmountText.transform.parent.GetComponent<RectTransform>();
+        rewardsRT.sizeDelta = new Vector2(415, 150);
+        CollectCoins();
     }
 
     public void On_Next_Btn_Click()
     {
+        if (!GameManager.Is_Internet_Available())
+        {
+            GameManager.Inst.Show_Popup(GameManager.Popups.NoInternetPopUp, false);
+            return;
+        }
         if (nextRewardLevel - currentLevel == 0 && !rewardsOb.activeSelf)
         {
             StartCoroutine(ShowRewards());
         }
         else
         {
-            GameManager.Inst.HidePopUp(gameObject);
-            GameManager.Inst.Show_Screen(GameManager.Screens.Home);
-            GameManager.Inst.homeScreen.Invoke(nameof(GameManager.Inst.homeScreen.ChangeCharacter), 0.5f);
+            AdsManager.Inst.ShowInterstitialAd((GeneralDataManager.Level - 1) % 3 == 0 ? "LevelCompleteRewardInterstitial" : "LevelComplete", () =>
+            {
+                GameManager.Inst.HidePopUp(gameObject);
+                GameManager.Inst.Show_Screen(GameManager.Screens.Home);
+                GameManager.Inst.homeScreen.HideCreateBtn();
+                GameManager.Inst.homeScreen.Invoke(nameof(GameManager.Inst.homeScreen.ChangeCharacter), 0.5f);
 
-            if (GameManager.Inst.homeScreen.leftEyeParent.childCount > 1)
-            {
-                Destroy(GameManager.Inst.homeScreen.leftEyeParent.GetChild(1).gameObject);
-                Destroy(GameManager.Inst.homeScreen.rightEyeParent.GetChild(1).gameObject);
-            }
-            if (isZoomIn)
-            {
-                isZoomIn = false;
-                GameManager.Inst.homeScreen.characterTR.DOKill();
-                GameManager.Inst.homeScreen.characterTR.DOScale(GameManager.Inst.homeScreen.CharacterScale(), 0.7f);
-                GameManager.Inst.homeScreen.characterTR.DOLocalMove(new Vector3(0, GameManager.Inst.homeScreen.CharacterScale() - 1f, 0), 0.7f);
-            }
-            GameManager.Inst.SetCoinParentAbovePopUp(false);
-            AdsManager.Inst.ShowInterstitialAd("LevelComplete");
-            System.GC.Collect();
-            Resources.UnloadUnusedAssets();
+                if (GameManager.Inst.homeScreen.leftEyeParent.childCount > 1)
+                {
+                    Destroy(GameManager.Inst.homeScreen.leftEyeParent.GetChild(1).gameObject);
+                    Destroy(GameManager.Inst.homeScreen.rightEyeParent.GetChild(1).gameObject);
+                }
+                if (isZoomIn)
+                {
+                    isZoomIn = false;
+                    GameManager.Inst.homeScreen.characterTR.DOKill();
+                    GameManager.Inst.homeScreen.characterTR.DOScale(GameManager.Inst.homeScreen.CharacterScale(), 0.7f);
+                    GameManager.Inst.homeScreen.characterTR.DOLocalMove(new Vector3(0, GameManager.Inst.homeScreen.CharacterScale() - 1f, 0), 0.7f);
+                }
+
+                if (nextBtnText.text == "View")
+                {
+                    GameManager.Inst.Show_Popup(GameManager.Popups.ThemesPopUp);
+                    ThemesPopUpController.Inst.On_Header_Btn_Click(4);
+                }
+                System.GC.Collect();
+                Resources.UnloadUnusedAssets();
+
+            });
         }
     }
 

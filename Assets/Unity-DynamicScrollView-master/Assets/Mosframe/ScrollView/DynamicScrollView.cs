@@ -118,60 +118,68 @@ namespace Mosframe
                     galleryPrototypeItem.galleryItems.Add(rt.GetComponent<GalleryItem>());
                 }
             }
-            else if (GameManager.activePopUps.Last() == GameManager.Popups.ShopPopUp)
+            else if (GameManager.activePopUps.Last() == GameManager.Popups.ThemesPopUp)
             {
                 int itemsPerRow;
-                if (ShopPopUpController.Inst.selectedIndex == 0 || ShopPopUpController.Inst.selectedIndex == 1)
-                    itemsPerRow = ShopPopUpController.Inst.bigItemsPerRow;
+                if (ThemesPopUpController.Inst.selectedIndex is 0 or 1 or 4)
+                    itemsPerRow = ThemesPopUpController.Inst.bigItemsPerRow;
                 else
-                    itemsPerRow = ShopPopUpController.Inst.smallItemsPerRow;
+                    itemsPerRow = ThemesPopUpController.Inst.smallItemsPerRow;
 
-                float totalSpacingBetweenItems = (itemsPerRow - 1) * ShopPopUpController.Inst.spacing;
-                float widthofParent = contentRect.rect.width - (ShopPopUpController.Inst.spacing * 2 + 2);
+                float totalSpacingBetweenItems = (itemsPerRow - 1) * ThemesPopUpController.Inst.spacing;
+                float widthofParent = contentRect.rect.width - (ThemesPopUpController.Inst.spacing * 2 + 2);
                 float widthPerItem = (widthofParent - totalSpacingBetweenItems) / itemsPerRow;
-                itemPrototype.sizeDelta = new Vector2(widthofParent, widthPerItem + ShopPopUpController.Inst.spacing);
+                itemPrototype.sizeDelta = new Vector2(widthofParent, widthPerItem + ThemesPopUpController.Inst.spacing);
 
                 RectTransform firstChild = itemPrototype.GetChild(0).GetComponent<RectTransform>();
                 firstChild.sizeDelta = new(widthPerItem, widthPerItem);
                 firstChild.anchoredPosition = new(widthPerItem / 2, widthPerItem / 2);
 
-                if (ShopPopUpController.Inst.selectedIndex == 0)
+                if (ThemesPopUpController.Inst.selectedIndex == 0)
                 {
                     PenPrototypeItem penPrototypeItem = itemPrototype.GetComponent<PenPrototypeItem>();
-                    for (int i = 1; i < ShopPopUpController.Inst.bigItemsPerRow; i++)
+                    for (int i = 1; i < ThemesPopUpController.Inst.bigItemsPerRow; i++)
                     {
                         penPrototypeItem.penItems.Add(MakeChild(i).GetComponent<PenItem>());
                     }
                 }
-                else if (ShopPopUpController.Inst.selectedIndex == 1)
+                else if (ThemesPopUpController.Inst.selectedIndex == 1)
                 {
                     LensPrototypeItem lensPrototypeItem = itemPrototype.GetComponent<LensPrototypeItem>();
-                    for (int i = 1; i < ShopPopUpController.Inst.bigItemsPerRow; i++)
+                    for (int i = 1; i < ThemesPopUpController.Inst.bigItemsPerRow; i++)
                     {
                         lensPrototypeItem.lensItems.Add(MakeChild(i).GetComponent<LensItem>());
                     }
                 }
-                else if (ShopPopUpController.Inst.selectedIndex == 2)
+                else if (ThemesPopUpController.Inst.selectedIndex == 2)
                 {
                     PupilPrototypeItem pupilPrototypeItem = itemPrototype.GetComponent<PupilPrototypeItem>();
-                    for (int i = 1; i < ShopPopUpController.Inst.smallItemsPerRow; i++)
+                    for (int i = 1; i < ThemesPopUpController.Inst.smallItemsPerRow; i++)
                     {
                         pupilPrototypeItem.pupilItems.Add(MakeChild(i).GetComponent<PupilShopItem>());
                     }
                 }
-                else
+                else if (ThemesPopUpController.Inst.selectedIndex == 3)
                 {
                     PatternPrototypeItem patternPrototypeItem = itemPrototype.GetComponent<PatternPrototypeItem>();
-                    for (int i = 1; i < ShopPopUpController.Inst.smallItemsPerRow; i++)
+                    for (int i = 1; i < ThemesPopUpController.Inst.smallItemsPerRow; i++)
                     {
                         patternPrototypeItem.patternItems.Add(MakeChild(i).GetComponent<PatternShopItem>());
+                    }
+                }
+                else
+                {
+                    ClickParticlePrototypeItem particlePrototypeItem = itemPrototype.GetComponent<ClickParticlePrototypeItem>();
+                    for (int i = 1; i < ThemesPopUpController.Inst.bigItemsPerRow; i++)
+                    {
+                        particlePrototypeItem.clickParticleItems.Add(MakeChild(i).GetComponent<ClickParticleItem>());
                     }
                 }
 
                 RectTransform MakeChild(int i)
                 {
                     RectTransform rt = Instantiate(firstChild, itemPrototype);
-                    rt.anchoredPosition = new Vector2((widthPerItem * i) + (ShopPopUpController.Inst.spacing * i) + widthPerItem / 2, widthPerItem / 2);
+                    rt.anchoredPosition = new Vector2((widthPerItem * i) + (ThemesPopUpController.Inst.spacing * i) + widthPerItem / 2, widthPerItem / 2);
                     return rt;
                 }
             }
@@ -195,16 +203,19 @@ namespace Mosframe
 
             this.resizeContent();
 
-            if (GameManager.activePopUps.Last() == GameManager.Popups.ShopPopUp)
+            if (GameManager.activePopUps.Last() == GameManager.Popups.ThemesPopUp)
             {
-                if (ShopPopUpController.Inst.selectedIndex <= 1)
+                if (ThemesPopUpController.Inst.selectedIndex is 0 or 1 or 4)
                 {
                     int index;
-                    if (ShopPopUpController.Inst.selectedIndex == 0)
-                        index = Mathf.FloorToInt(GeneralDataManager.SelectedPenIndex / (float)ShopPopUpController.Inst.bigItemsPerRow);
+                    if (ThemesPopUpController.Inst.selectedIndex == 0)
+                        index = Mathf.FloorToInt(GeneralDataManager.SelectedPenIndex / (float)ThemesPopUpController.Inst.bigItemsPerRow);
+                    else if (ThemesPopUpController.Inst.selectedIndex == 1)
+                        index = Mathf.FloorToInt(GeneralDataManager.SelectedLensIndex / (float)ThemesPopUpController.Inst.bigItemsPerRow);
                     else
-                        index = Mathf.FloorToInt(GeneralDataManager.SelectedLensIndex / (float)ShopPopUpController.Inst.bigItemsPerRow);
-                    contentRect.anchoredPosition = new Vector2(0, Mathf.Min(contentRect.rect.height - viewportSize, index * this.itemSize));
+                        index = Mathf.FloorToInt((GeneralDataManager.SelectedClickParticleIndex + 1) / (float)ThemesPopUpController.Inst.bigItemsPerRow);
+                    if (contentRect.rect.height > viewportSize)
+                        contentRect.anchoredPosition = new Vector2(0, Mathf.Min(contentRect.rect.height - viewportSize, index * this.itemSize));
                 }
             }
             else if (GameManager.activePopUps.Last() == GameManager.Popups.GalleryPopUp)
@@ -213,7 +224,7 @@ namespace Mosframe
                     contentRect.anchoredPosition = new Vector2(0, contentRect.rect.height - viewportSize);
             }
 
-            toAddMarginForScrollDown = -100;
+            toAddMarginForScrollDown = (int)-this.itemSize;
         }
 
 
@@ -308,8 +319,8 @@ namespace Mosframe
             {
                 if (GameManager.activePopUps.Last() == GameManager.Popups.GalleryPopUp)
                     size.y = this.itemSize * this.totalItemCount + GalleryPopUp.Inst.spacing;
-                else if (GameManager.activePopUps.Last() == GameManager.Popups.ShopPopUp)
-                    size.y = this.itemSize * this.totalItemCount + ShopPopUpController.Inst.spacing;
+                else if (GameManager.activePopUps.Last() == GameManager.Popups.ThemesPopUp)
+                    size.y = this.itemSize * this.totalItemCount + ThemesPopUpController.Inst.spacing;
                 else
                     size.y = this.itemSize * this.totalItemCount;
             }

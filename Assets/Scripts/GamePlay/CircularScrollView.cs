@@ -6,6 +6,7 @@ using DG.Tweening;
 public class CircularScrollView : MonoBehaviour
 {
     [SerializeField] private RectTransform contentParent, patternScrollViewItem;
+    [SerializeField] private CanvasGroup mainCg;
     private PatternData patternData;
     private int currentAmount = 0;
     private float startOffset = 180f;
@@ -133,5 +134,10 @@ public class CircularScrollView : MonoBehaviour
         {
             patternItem.patternImage.color = new(color.r, color.g, color.b, patternItem.patternImage.color.a);
         }
+    }
+
+    internal void SetOpacity(float opacity)
+    {
+        mainCg.alpha = opacity;
     }
 }

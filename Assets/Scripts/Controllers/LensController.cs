@@ -22,10 +22,10 @@ public class LensController : MonoBehaviour
     }
     private void OnEnable()
     {
-        GameManager.Inst.homeScreen.characterTR.localPosition = GeneralDataManager.Inst.characterDetails[GameManager.Inst.homeScreen.characterIndex].lensDragRightPos;
+        GameManager.Inst.homeScreen.characterTR.localPosition = GeneralDataManager.Inst.characterDetails[GameManager.Inst.homeScreen.characterIndex].lensDragLeftPos;
         GameManager.Inst.homeScreen.characterTR.localScale = new(3.59f, 3.59f, 3.59f);
         SetActiveTarget(false);
-        RefreshForNativeAd();
+        RefreshForAd();
         ResetCaps();
     }
 
@@ -57,7 +57,6 @@ public class LensController : MonoBehaviour
                         currentLens.DOKill();
                         currentLens.DOMove(lensTarget.position, 0.2f);
                         lensTarget.localScale = new(0.95f, 0.95f, 0.95f);
-
                         lensTarget.GetComponent<RotateZ>().enabled = false;
                         currentLens.GetChild(0).localScale = new(0.151f, 0.151f, 0.151f);
 
@@ -84,27 +83,45 @@ public class LensController : MonoBehaviour
                 if (isInsideRadius)
                 {
                     SoundManager.Inst.Play("EyePlace");
-                    if (isRightLens)
+                    SoundManager.Inst.LightVibrate();
+                    if (!isRightLens)
                     {
                         Transform tr = currentLens.GetChild(0);
-                        tr.SetParent(GameManager.Inst.homeScreen.rightEyeParent);
+                        tr.SetParent(GameManager.Inst.homeScreen.leftEyeParent);
                         tr.localScale = Vector3.one * 0.0002325472f;
                         tr.SetAsLastSibling();
                         tr.localPosition = Vector3.zero;
 
                         SetActiveTarget(false);
-                        RotateLeftCap();
                         currentLens = null;
                         if (UserTutorialController.Inst != null)
                         {
                             GeneralDataManager.TutorialStep++;// to 10
                             GameManager.Inst.HidePopUp(UserTutorialController.Inst.gameObject);
                         }
+
+                        GameManager.Inst.homeScreen.characterTR.DOLocalMove(GeneralDataManager.Inst.characterDetails[GameManager.Inst.homeScreen.characterIndex].lensDragRightPos, 0.8f).OnComplete(() =>
+                        {
+                            isRightLens = true;
+                            currentLens = rightLensParent;
+                            SetActiveTarget(true);
+
+                            if (GeneralDataManager.TutorialStep == 10)
+                            {
+                                GameManager.Inst.Show_Popup(GameManager.Popups.TutorialPopUp);
+                                UserTutorialController.Inst.StartCoroutine(UserTutorialController.Inst.SetHandAnimForLens(rightLensParent.parent, GetTargetPos()));
+                            }
+                            if (!Input.GetMouseButton(0))
+                            {
+                                rightLensParent.GetComponent<Animation>().Play();
+                                GameManager.Inst.homeScreen.PlayBlinkAnim(true);
+                            }
+                        });
                     }
                     else
                     {
                         Transform tr = currentLens.GetChild(0);
-                        tr.SetParent(GameManager.Inst.homeScreen.leftEyeParent);
+                        tr.SetParent(GameManager.Inst.homeScreen.rightEyeParent);
                         tr.localScale = Vector3.one * 0.0002325472f;
                         tr.SetAsLastSibling();
                         SetActiveTarget(false);
@@ -274,22 +291,24 @@ public class LensController : MonoBehaviour
         rightLensCapTR.anchoredPosition = rightLensParent.parent.GetComponent<RectTransform>().anchoredPosition = new Vector2(-177, -28);
     }
 
-    internal void RotateRightCap(UnityAction onComplete)
+    internal void RotateRightCap()
     {
-        isRightLens = true;
         rightLensCapTR.DOLocalRotate(new Vector3(0, 0, 360), 0.5f, RotateMode.FastBeyond360).OnComplete(() =>
         {
-            rightLensCapTR.DOAnchorPos(new(rightLensCapTR.anchoredPosition.x + rightLensCapTR.sizeDelta.x * 0.85f, rightLensCapTR.anchoredPosition.y + rightLensCapTR.sizeDelta.x * 0.85f), 0.5f).OnComplete(() =>
+            rightLensCapTR.DOAnchorPos(new((-defaultLeftLidPos.x) + rightLensCapTR.sizeDelta.x * 0.85f, defaultLeftLidPos.y + rightLensCapTR.sizeDelta.x * 0.85f), 0.5f).OnComplete(() =>
             {
                 rightLensCapTR.SetAsFirstSibling();
                 rightLensCapTR.GetComponent<Image>().DOFade(0, 0.5f);
                 rightLensCapTR.DOAnchorPos(new Vector2(-defaultLeftLidPos.x, defaultLeftLidPos.y), 0.5f).OnComplete(() =>
                 {
+                    Transform rightLens = rightLensParent.GetChild(0);
                     rightLensCapTR.gameObject.SetActive(false);
-                    onComplete.Invoke();
-                    GameManager.Inst.homeScreen.characterTR.gameObject.SetActive(true);
-                    GameManager.Inst.homeScreen.DoFadeCharacter(1f, 0.5f);
-                    GameManager.Inst.homeScreen.PlayOrStopCharacterAnim(false);
+                    rightLens.DOScale(rightLens.localScale * 1.05f, 0.2f);
+                    rightLens.DOLocalMove(rightLens.localPosition * 1.05f, 0.2f).OnComplete(() =>
+                    {
+                        rightLens.DOScale(0.17f, 0.7f);
+                        rightLens.DOLocalMove(Vector3.zero, 0.7f);
+                    });
                 });
             });
         });
@@ -312,7 +331,6 @@ public class LensController : MonoBehaviour
     internal void RotateLeftCap()
     {
         isRightLens = false;
-        GameManager.Inst.homeScreen.characterTR.DOLocalMove(GeneralDataManager.Inst.characterDetails[GameManager.Inst.homeScreen.characterIndex].lensDragLeftPos, 0.8f);
         leftLensCapTR.DOLocalRotate(new Vector3(0, 0, 360), 0.5f, RotateMode.FastBeyond360).OnComplete(() =>
         {
             leftLensCapTR.DOAnchorPos(new(defaultLeftLidPos.x - leftLensCapTR.sizeDelta.x * 0.85f, defaultLeftLidPos.y + leftLensCapTR.sizeDelta.x * 0.85f), 0.5f).OnComplete(() =>
@@ -321,20 +339,31 @@ public class LensController : MonoBehaviour
                 leftLensCapTR.GetComponent<Image>().DOFade(0, 0.5f);
                 leftLensCapTR.DOAnchorPos(defaultLeftLidPos, 0.5f).OnComplete(() =>
                 {
+                    Transform leftLens = leftLensParent.GetChild(0);
                     leftLensCapTR.gameObject.SetActive(false);
-                    currentLens = leftLensParent;
-                    SetActiveTarget(true);
-                    if (!Input.GetMouseButton(0))
+                    leftLens.DOScale(leftLens.localScale * 1.05f, 0.2f);
+                    leftLens.DOLocalMove(leftLens.localPosition * 1.05f, 0.2f).OnComplete(() =>
                     {
-                        leftLensParent.GetComponent<Animation>().Play();
-                        GameManager.Inst.homeScreen.PlayBlinkAnim(true);
-                    }
-
-                    if (GeneralDataManager.TutorialStep == 10)
-                    {
-                        GameManager.Inst.Show_Popup(GameManager.Popups.TutorialPopUp);
-                        UserTutorialController.Inst.StartCoroutine(UserTutorialController.Inst.SetHandAnimForLens(leftLensParent.parent.position, lensTarget.position));
-                    }
+                        leftLens.DOScale(0.17f, 0.7f);
+                        leftLens.DOLocalMove(Vector3.zero, 0.7f).OnComplete(() =>
+                        {
+                            currentLens = leftLensParent;
+                            SetActiveTarget(true);
+                            if (!Input.GetMouseButton(0))
+                            {
+                                leftLensParent.GetComponent<Animation>().Play();
+                                GameManager.Inst.homeScreen.PlayBlinkAnim(true);
+                            }
+                            if (GeneralDataManager.TutorialStep == 9)
+                            {
+                                GameManager.Inst.Show_Popup(GameManager.Popups.TutorialPopUp);
+                                UserTutorialController.Inst.StartCoroutine(UserTutorialController.Inst.SetHandAnimForLens(leftLensParent.parent, lensTarget.position));
+                            }
+                        });
+                    });
+                    GameManager.Inst.homeScreen.characterTR.gameObject.SetActive(true);
+                    GameManager.Inst.homeScreen.DoFadeCharacter(1f, 0.5f);
+                    GameManager.Inst.homeScreen.PlayOrStopCharacterAnim(false);
                 });
             });
         });
@@ -357,13 +386,13 @@ public class LensController : MonoBehaviour
         boxImage.transform.SetAsFirstSibling();
     }
 
-    internal void RefreshForNativeAd()
+    internal void RefreshForAd()
     {
         RectTransform rt = GetComponent<RectTransform>();
         rt.DOKill();
-        if (AdsManager.Inst.isNativeAdLoaded)
+        if (AdsManager.Inst.isBannerLoaded)
         {
-            rt.anchoredPosition = new Vector2(rt.anchoredPosition.x, 391);
+            rt.anchoredPosition = new Vector2(rt.anchoredPosition.x, 211 + GameManager.Inst.bannerHeight + 20);
         }
         else
         {

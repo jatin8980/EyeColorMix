@@ -180,8 +180,13 @@ public class SoundManager : SingletonComponent<SoundManager>
 
     internal void LightVibrate()
     {
+#if UNITY_ANDROID
         if (IsVibrationOn)
             Vibration.VibrateAndroid(20);
+#else
+        if (IsVibrationOn)
+            Vibration.VibrateIOS(ImpactFeedbackStyle.Soft);
+#endif
     }
     #endregion
 

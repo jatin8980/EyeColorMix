@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
 {
     [Header("General")]
     public GameObject adLoaderPanel;
-    public RectTransform nativeAdParent;
+    public GameObject interstitialAdLoader;
 
     [Header("Screen Referance")]
     public GamePlayUIController gamePlayUi;
@@ -24,14 +24,16 @@ public class GameManager : MonoBehaviour
     [Header("PopUp Refrence")]
     [SerializeField] private Transform popUpParent;
     [SerializeField]
-    private GameObject settingPopUp, exitPopUp, toastPrefab, rateusPopUp, removeAdsPopUp, chooseEffectPopUp,
-        chooseImagePopUp, galleryPopUp, galleryDetailPopUp, levelCompletePopUp, shopPopUp, freeCoinsPopUp, tutorialPopUp, permissionPopUp, dailyRewardPopUp;
+    private GameObject settingPopUp, exitPopUp, toastPrefab, rateusPopUp, chooseEffectPopUp,
+        chooseImagePopUp, galleryPopUp, galleryDetailPopUp, levelCompletePopUp, themePopUp, storePopUp, tutorialPopUp,
+        permissionPopUp, dailyRewardPopUp, unlockItemPopUp, noInternetPopUp;
 
     [Header("Others")]
     public Camera mainCamera;
     public GameObject loaderOb;
     public Transform coinCollectParentTR;
-    [SerializeField] private RectTransform coinsRT, clickParticleRT;
+    [SerializeField] private RectTransform coinsRT;
+    [SerializeField] private Transform clickParticleParentTR;
     [SerializeField] private Text coinText;
     [SerializeField] private Sprite coinsUnfillSp, coinsFillSp;
 
@@ -40,6 +42,10 @@ public class GameManager : MonoBehaviour
     internal static GameManager Inst;
     internal static List<GameObject> activePopUpsObs = new();
     internal static List<Popups> activePopUps = new();
+    private List<Popups> popUpsToShowCoinsAbove = new() { Popups.ChooseImagePopUp, Popups.DailyRewardPopUp, Popups.LevelCompletePopUp, Popups.StorePopUp, Popups.ThemesPopUp, Popups.UnlockItemPopUp},
+                         popUpsToShowFillCoins = new() { Popups.LevelCompletePopUp, Popups.StorePopUp, Popups.ThemesPopUp };
+
+    internal float bannerHeight = 160;
 
     private void Awake()
     {
@@ -54,6 +60,8 @@ public class GameManager : MonoBehaviour
         activePopUpsObs.Add(null);
         SetActiveCoins(false);
         homeScreen.characterTR.gameObject.SetActive(false);
+        Show_Screen(Screens.Launch);
+        Invoke(nameof(SetSelectedClickParticle), 1f);
     }
 
     public enum Screens
@@ -69,17 +77,19 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonUp(0) && activePopUps.Count == 1 && (activePopUps[0] is Popups.TutorialPopUp or Popups.Null or Popups.RemoveAdsPopUp
-            or Popups.ChooseEffectPopUp or Popups.ChooseImagePopUp or Popups.GalleryPopUp or Popups.LevelCompletePopUp or Popups.ShopPopUp))
+        if (Input.GetMouseButtonUp(0) && activePopUps.Last() is Popups.TutorialPopUp or Popups.Null or Popups.StorePopUp
+            or Popups.ChooseEffectPopUp or Popups.ChooseImagePopUp or Popups.GalleryPopUp or Popups.LevelCompletePopUp or Popups.ThemesPopUp)
         {
             Invoke(nameof(ShowClickParticle), 0.05f);
         }
         if (!Input.GetKeyDown(KeyCode.Escape)) return;
-        if (activeScreen == Screens.Launch || GeneralDataManager.Inst.IsNoClickPanelOn() || adLoaderPanel.activeSelf) return;
+        if (activeScreen == Screens.Launch || GeneralDataManager.Inst.IsNoClickPanelOn() || adLoaderPanel.activeSelf
+            || interstitialAdLoader.activeSelf || loaderOb.activeSelf) return;
 
         if (popUpParent.childCount > 0)
         {
-            if (activePopUps[activePopUps.Count - 1] is Popups.ChooseEffectPopUp or Popups.LevelCompletePopUp or Popups.TutorialPopUp or Popups.Permission)
+            if (activePopUps[activePopUps.Count - 1] is Popups.ChooseEffectPopUp or Popups.LevelCompletePopUp or Popups.TutorialPopUp
+                or Popups.Permission or Popups.NoInternetPopUp)
             {
                 return;
             }
@@ -93,6 +103,12 @@ public class GameManager : MonoBehaviour
                     return;
             }
             HidePopUp(activePopUpsObs[activePopUpsObs.Count - 1]);
+            return;
+        }
+
+        if (activeScreen == Screens.GamePlay)
+        {
+            gamePlayUi.On_Back_Btn_Click();
             return;
         }
 
@@ -124,6 +140,8 @@ public class GameManager : MonoBehaviour
             case Screens.Home:
                 activeScreenObj = homeScreen.gameObject;
                 activeScreenObj.SetActive(true);
+                homeScreen.characterTR.gameObject.SetActive(true);
+                homeScreen.DoFadeCharacter(1, 0);
                 return;
             case Screens.GamePlay:
                 activeScreenObj = gamePlayUi.gameObject;
@@ -141,17 +159,18 @@ public class GameManager : MonoBehaviour
         Setting,
         Exit,
         RateUs,
-        RemoveAdsPopUp,
         ChooseEffectPopUp,
         ChooseImagePopUp,
         GalleryPopUp,
         GalleryDetailPopUp,
         LevelCompletePopUp,
-        ShopPopUp,
-        FreeCoinsPopUp,
+        ThemesPopUp,
+        StorePopUp,
         TutorialPopUp,
         Permission,
-        DailyRewardPopUp
+        DailyRewardPopUp,
+        UnlockItemPopUp,
+        NoInternetPopUp
     }
 
     public void Show_Popup(Popups popup, bool destroyOld = true)
@@ -172,19 +191,30 @@ public class GameManager : MonoBehaviour
             Popups.Setting => Instantiate(settingPopUp, popUpParent),
             Popups.Exit => Instantiate(exitPopUp, popUpParent),
             Popups.RateUs => Instantiate(rateusPopUp, popUpParent),
-            Popups.RemoveAdsPopUp => Instantiate(removeAdsPopUp, popUpParent),
             Popups.ChooseEffectPopUp => Instantiate(chooseEffectPopUp, popUpParent),
             Popups.ChooseImagePopUp => Instantiate(chooseImagePopUp, popUpParent),
             Popups.GalleryPopUp => Instantiate(galleryPopUp, popUpParent),
             Popups.GalleryDetailPopUp => Instantiate(galleryDetailPopUp, popUpParent),
             Popups.LevelCompletePopUp => Instantiate(levelCompletePopUp, popUpParent),
-            Popups.ShopPopUp => Instantiate(shopPopUp, popUpParent),
-            Popups.FreeCoinsPopUp => Instantiate(freeCoinsPopUp, popUpParent),
+            Popups.ThemesPopUp => Instantiate(themePopUp, popUpParent),
+            Popups.StorePopUp => Instantiate(storePopUp, popUpParent),
             Popups.TutorialPopUp => Instantiate(tutorialPopUp, popUpParent),
             Popups.Permission => Instantiate(permissionPopUp, popUpParent),
             Popups.DailyRewardPopUp => Instantiate(dailyRewardPopUp, popUpParent),
+            Popups.UnlockItemPopUp => Instantiate(unlockItemPopUp, popUpParent),
+            Popups.NoInternetPopUp => Instantiate(noInternetPopUp, popUpParent),
             _ => null,
         };
+
+        if (popUpsToShowCoinsAbove.Contains(popup))
+        {
+            SetCoinParentAbovePopUp(true);
+            SetActiveFillCoin(popUpsToShowFillCoins.Contains(popup));
+        }
+        else
+        {
+            SetCoinParentAbovePopUp(false);
+        }
     }
 
     public void HidePopUp(GameObject popup)
@@ -200,6 +230,20 @@ public class GameManager : MonoBehaviour
             activePopUps[0] = Popups.Null;
             activePopUpsObs[0] = null;
         }
+
+        if (popUpsToShowCoinsAbove.Contains(activePopUps.Last()))
+        {
+            SetCoinParentAbovePopUp(true);
+            SetActiveFillCoin(popUpsToShowFillCoins.Contains(activePopUps.Last()));
+        }
+        else
+        {
+            SetCoinParentAbovePopUp(false);
+            if (activePopUps.Last() is Popups.Null or Popups.TutorialPopUp)
+            {
+                SetActiveFillCoin(activeScreen == Screens.GamePlay);
+            }
+        }
     }
 
     internal static bool Is_Internet_Available()
@@ -207,42 +251,42 @@ public class GameManager : MonoBehaviour
         return Application.internetReachability != NetworkReachability.NotReachable;
     }
 
-    internal void RefreshCurrentScreen()
+    internal void RefreshCurrentPopUpForBannerAd()
     {
         if (activePopUps.Count > 1 || activePopUps[0] != Popups.Null)
         {
             if (activePopUps.Contains(Popups.ChooseImagePopUp))
             {
-                FindObjectOfType<ChooseImagePopUpController>().RefreshForNativeAd();
+                FindAnyObjectByType<ChooseImagePopUpController>().RefreshForAd();
             }
             else if (activePopUps.Contains(Popups.ChooseEffectPopUp))
             {
-                FindObjectOfType<ChooseEffectPopUpController>().RefreshForNativeAd();
+                FindAnyObjectByType<ChooseEffectPopUpController>().RefreshForAd();
             }
-            else if (activePopUps.Contains(Popups.ShopPopUp))
+            else if (activePopUps.Contains(Popups.ThemesPopUp))
             {
-                FindObjectOfType<ShopPopUpController>().RefreshForNativeAd();
+                FindAnyObjectByType<ThemesPopUpController>().RefreshForAd();
             }
             else if (activePopUps.Contains(Popups.GalleryPopUp))
             {
-                FindObjectOfType<GalleryPopUp>().RefreshForNativeAd();
+                FindAnyObjectByType<GalleryPopUp>().RefreshForAd();
             }
         }
         if (EffectsController.Inst != null && EffectsController.Inst.gameObject.activeSelf)
-            EffectsController.Inst.RefreshForNativeAd();
+            EffectsController.Inst.RefreshForAd();
         else if (PupilController.Inst != null && PupilController.Inst.gameObject.activeSelf)
-            PupilController.Inst.RefreshForNativeAd();
+            PupilController.Inst.RefreshForAd();
         else if (PatternController.Inst != null && PatternController.Inst.gameObject.activeSelf)
-            PatternController.Inst.RefreshForNativeAd();
+            PatternController.Inst.RefreshForAd();
         else if (HighlightController.Inst != null && HighlightController.Inst.gameObject.activeSelf)
-            HighlightController.Inst.RefreshForNativeAd();
+            HighlightController.Inst.RefreshForAd();
         else if (gamePlayUi.lensController != null && gamePlayUi.lensController.gameObject.activeSelf)
-            gamePlayUi.lensController.RefreshForNativeAd();
+            gamePlayUi.lensController.RefreshForAd();
     }
 
-    internal float GetDifferenceFromTop() => 1920 - 1920 * nativeAdParent.anchorMax.y;
+    internal float GetDifferenceFromTop() => 1920 - 1920 * coinsRT.parent.GetComponent<RectTransform>().anchorMax.y;
 
-    internal float GetDifferenceFromBottom() => 1920 * nativeAdParent.anchorMin.y;
+    internal float GetDifferenceFromBottom() => 1920 * coinsRT.parent.GetComponent<RectTransform>().anchorMin.y;
 
     internal Transform GetCoinTarget() => coinsRT.GetChild(1);
 
@@ -258,18 +302,7 @@ public class GameManager : MonoBehaviour
     internal void SetCoinsText(string text)
     {
         coinText.text = text;
-        if (coinText.preferredWidth + 149 < 250)
-        {
-            coinsRT.sizeDelta = new Vector2(coinText.preferredWidth + 149, coinsRT.rect.height);
-            coinText.resizeTextForBestFit = false;
-            coinText.fontSize = 40;
-        }
-        else
-        {
-            coinsRT.sizeDelta = new Vector2(250, coinsRT.rect.height);
-            coinText.fontSize = 40;
-            coinText.resizeTextForBestFit = true;
-        }
+        coinsRT.sizeDelta = new Vector2(Mathf.Min(coinText.preferredWidth + 149, 250), coinsRT.rect.height);
     }
 
     internal void SetActiveFillCoin(bool show)
@@ -311,11 +344,21 @@ public class GameManager : MonoBehaviour
         {
             Vector3 worldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             worldPos.z = 0;
-            clickParticleRT.position = worldPos;
-            clickParticleRT.gameObject.SetActive(false);
-            clickParticleRT.gameObject.SetActive(true);
+            clickParticleParentTR.position = worldPos;
+            clickParticleParentTR.gameObject.SetActive(false);
+            clickParticleParentTR.gameObject.SetActive(true);
         }
         canShowClickParticle = true;
+    }
+
+    internal void SetSelectedClickParticle()
+    {
+        clickParticleParentTR.position = new Vector3(0, 8, 0);
+        canShowClickParticle = false;
+        foreach (Transform tr in clickParticleParentTR)
+            Destroy(tr.gameObject);
+        if (GeneralDataManager.SelectedClickParticleIndex != -1)
+            Instantiate(Resources.Load<Transform>("Prefabs/ClickParticles/" + GeneralDataManager.SelectedClickParticleIndex), clickParticleParentTR);
     }
 
     internal void Show_Toast(string message)
@@ -332,6 +375,7 @@ public class GameManager : MonoBehaviour
 
     internal void On_Rate_Btn_Click()
     {
+        AdsManager.Inst.CanShowAppOpen = false;
 #if UNITY_IPHONE
         Application.OpenURL(GeneralDataManager.iPhoneShareLink);
 #else
@@ -366,9 +410,7 @@ public class GameManager : MonoBehaviour
             Show_Toast("Please complete tutorial first!");
             return;
         }
-        if (activePopUps.Contains(Popups.DailyRewardPopUp))
-            return;
-        Show_Popup(Popups.FreeCoinsPopUp, false);
+        Show_Popup(Popups.StorePopUp, false);
     }
 
 }

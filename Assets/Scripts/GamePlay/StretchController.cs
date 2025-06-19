@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class StretchController : MonoBehaviour
 {
-    [SerializeField] private Transform stretchProgressPrefabTR, stretchProgressParent;
+    [SerializeField] private Transform stretchProgressPrefabTR, stretchProgressParent, borderTR;
     [SerializeField] private Material copyUvsMat, combineTextureMat, blurMat;
     public MarkTRItem markPrefab;
     public Transform handTR, markTRParent;
@@ -18,7 +18,7 @@ public class StretchController : MonoBehaviour
     private List<Vector3[]> currentVerticiesList = new();
     private Dictionary<int, Transform> stretchProgressInfos = new();
     private RenderTexture[] stretchedRenderTextures = new RenderTexture[4];
-    private float defaultStretchProgressScale = 0.05f, vibrateTime = 0, stretchRandomRotate;
+    private float defaultStretchProgressScale = 0.04f, vibrateTime = 0, stretchRandomRotate;
     private Vector3 targetForHand;
     private bool turnOffBrushInvoked, isPlayingBrushSound;
 
@@ -38,6 +38,11 @@ public class StretchController : MonoBehaviour
         GameController.Inst.beforeSRs[0].transform.parent.parent.localScale = transform.localScale = new Vector3(2.25f, 2.25f, 2.25f) * GameManager.Inst.gamePlayUi.smallScale;
         turnOffBrushInvoked = false;
         vibrateTime = 0;
+        if (GameManager.Inst.gamePlayUi.bigScale != 0)
+        {
+            Vector3 scale = (new Vector3(2.25f, 2.25f, 2.25f) * GameManager.Inst.gamePlayUi.bigScale / (GameManager.Inst.gamePlayUi.bigScale * 864f)) * 22;
+            borderTR.localScale = new Vector3(2, 2, 2) + scale;
+        }
     }
 
     private void Start()
@@ -212,7 +217,7 @@ public class StretchController : MonoBehaviour
             GameManager.Inst.Show_Popup(GameManager.Popups.TutorialPopUp);
         }
         SoundManager.Inst.Play("Step");
-        GameManager.Inst.gamePlayUi.NextBtnActiveSelf(true);
+        GameManager.Inst.gamePlayUi.NextBtnActiveSelf(true, true);
         turnOffBrushInvoked = false;
         CancelInvoke(nameof(StopBrushSound));
         StopBrushSound();
@@ -269,15 +274,11 @@ public class StretchController : MonoBehaviour
 
     internal void SnapToCurrentPos(MarkTRItem markTRItem)
     {
-        if (vibrateTime > 0.15f && Input.GetMouseButton(0))
-        {
-            SoundManager.Inst.LightVibrate();
-            vibrateTime = 0;
-        }
+
         float totalDistance = Mathf.Min(Vector3.Distance(transform.position, handTR.position), transform.localScale.x);
 
         float currentTouchRadius = totalDistance / transform.localScale.x;
-
+        Vector3 oldPos = markTRItem.transform.localPosition;
         float newDistance = Vector3.Distance(markTRItem.realPos, markTRItem.realPos * currentTouchRadius);
         if (newDistance < markTRItem.lastDistance)
         {
@@ -300,6 +301,11 @@ public class StretchController : MonoBehaviour
             {
                 stretchProgressInfos[markTRItem.vertexIndex - 1].localScale = (defaultStretchProgressScale - (defaultStretchProgressScale * currentTouchRadius)) * Vector3.one;
             }
+        }
+        if (vibrateTime > 0.15f && Input.GetMouseButton(0) && oldPos != markTRItem.transform.localPosition)
+        {
+            SoundManager.Inst.LightVibrate();
+            vibrateTime = 0;
         }
     }
 }

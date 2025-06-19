@@ -25,7 +25,7 @@ public class GalleryPopUp : MonoBehaviour
         {
             scrollView.totalItemCount = Mathf.CeilToInt(listOfCharacterPlayedInLevel.Count / 2f);
         }
-        RefreshForNativeAd();
+        RefreshForAd();
     }
 
     public void On_Back_Btn_Click()
@@ -33,12 +33,12 @@ public class GalleryPopUp : MonoBehaviour
         GameManager.Inst.HidePopUp(gameObject);
     }
 
-    internal void RefreshForNativeAd()
+    internal void RefreshForAd()
     {
         RectTransform rt = scrollView.GetComponent<RectTransform>();
-        if (AdsManager.Inst.isNativeAdLoaded)
+        if (AdsManager.Inst.isBannerLoaded)
         {
-            rt.offsetMin = new(rt.offsetMin.x, 320);
+            rt.offsetMin = new(rt.offsetMin.x, 150 + GameManager.Inst.bannerHeight + 20);
         }
         else
         {

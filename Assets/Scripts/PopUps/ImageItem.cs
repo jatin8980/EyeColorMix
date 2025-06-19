@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class ImageItem : UIBehaviour, IDynamicScrollViewItem
 {
-    [SerializeField] private GameObject adOb;
+    [SerializeField] private GameObject lockOb;
     [SerializeField] private Image imageIcon;
     private int imageIndex;
 
@@ -18,26 +18,33 @@ public class ImageItem : UIBehaviour, IDynamicScrollViewItem
         imageIcon.sprite = Resources.Load<Sprite>("Sprites/ColorPickImages/" + ChooseImagePopUpController.Inst.CategoryIndexToString(ChooseImagePopUpController.Inst.selectedCategoryIndex) + "/" + imageIndex);
 
         if (ChooseImagePopUpController.Inst.lockedByAdImages[ChooseImagePopUpController.Inst.selectedCategoryIndex].Contains(imageIndex)
-            && !GeneralDataManager.UnlockedImages[ChooseImagePopUpController.Inst.selectedCategoryIndex].Contains(imageIndex))
+            && !ChooseImagePopUpController.Inst.unlockedImages[ChooseImagePopUpController.Inst.selectedCategoryIndex].Contains(imageIndex))
         {
-            adOb.SetActive(true);
+            lockOb.SetActive(true);
         }
         else
         {
-            adOb.SetActive(false);
+            lockOb.SetActive(false);
         }
     }
 
     public void On_Image_Btn_Click()
     {
         if (ChooseImagePopUpController.Inst.lockedByAdImages[ChooseImagePopUpController.Inst.selectedCategoryIndex].Contains(imageIndex)
-            && !GeneralDataManager.UnlockedImages[ChooseImagePopUpController.Inst.selectedCategoryIndex].Contains(imageIndex))
+            && !ChooseImagePopUpController.Inst.unlockedImages[ChooseImagePopUpController.Inst.selectedCategoryIndex].Contains(imageIndex))
         {
             ChooseImagePopUpController.Inst.imageIndexToUnlock = imageIndex;
             if (GeneralDataManager.Inst.testMode)
-                ChooseImagePopUpController.Inst.UnlockImageCallBack();
+                ChooseImagePopUpController.Inst.UnlockImage();
             else
-                AdsManager.Inst.RequestAndLoadRewardedAd("UnlockImage");
+            {
+                GameManager.Inst.Show_Popup(GameManager.Popups.UnlockItemPopUp, false);
+                FindAnyObjectByType<UnlockItemPopUp>().SetThis(imageIcon.sprite, 0, 150, new(() =>
+                {
+                    GameManager.Inst.Show_Toast("Image unlocked!");
+                    ChooseImagePopUpController.Inst.UnlockImage();
+                }));
+            }
         }
         else
         {

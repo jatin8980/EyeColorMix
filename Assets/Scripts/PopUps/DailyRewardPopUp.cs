@@ -19,7 +19,6 @@ public class DailyRewardPopUp : MonoBehaviour
         doubleRewardBtnTr.gameObject.SetActive(false);
         closeBtnTR.gameObject.SetActive(false);
         claimBtnOb.SetActive(true);
-        GameManager.Inst.SetCoinParentAbovePopUp(true);
         switch (GeneralDataManager.DailyRewardDayCount)
         {
             case 1:
@@ -46,11 +45,6 @@ public class DailyRewardPopUp : MonoBehaviour
         }
         doubleRewardText.text = "Get " + (rewardAmount * 2);
         rewardText.text = "+" + rewardAmount;
-    }
-
-    private void OnDestroy()
-    {
-        GameManager.Inst.SetCoinParentAbovePopUp(false);
     }
 
     private void ClaimCoins()

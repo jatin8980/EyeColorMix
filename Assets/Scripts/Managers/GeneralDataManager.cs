@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -12,15 +12,20 @@ public class GeneralDataManager : MonoBehaviour
     internal static GeneralDataManager Inst;
     internal static string androidShareLink = "https://play.google.com/store/apps/details?id=",
                             iPhoneShareLink = "itms-apps://itunes.apple.com/app/id6739959573";
-    internal int[] levelNeededToUnlockPupil = { 0, 0, 0, -1, 2, 2, -1, 3, -1, 3, -1, 5, 7, 10, -1, 13, 17, 21, 26, -1, 31, -1, 37, 43, 50, 57, -1, 64, -1, 71, 78, 85, 92, -1, 106, 120, 134, 148, -1, 155, 162, 169, 176, -1, 183, 190 },
-        levelNeededToUnlockPattern = { 0, 0, 0, -1, 5, -1, -1, 7, 10, 13, -1, 21, -1, 31, 43, 57, 71, -1, 85, -1, 99, 113, 127, 141, -1 },
-        levelNeededToUnlockEffect = { 0, 0, 0, 5, 10, 17, 26, 37, 43, 50, 57 },
-        levelNeededToUnlockHighlight = { 0, 0, 0, 3, 3, 3, 7, 7, 13, 13, 17, 17, 21, 21, 26, 26, 31, 31, 37, 50, 64, 78, 92, 99, 106, 113, 120, 127, 134, 141, 148, 155, 162, 169, 176, 183, 190, 197, 197, 204, 204, 211, 211, 218, 218, 225, 225, 232, 232, 232 };
+    internal int[] levelNeededToUnlockPupil = { 0, 0, 0, -1, 3, 3, -1, 5, -1, 5, -1, 7, 10, 13, -1, 17, 21, 26, 31, -1, 37, -1, 43, 50, 57, 64, -1, 71, -1, 78, 85, 92, 99, -1, 113, 127, 141, 155, -1, 162, 169, 176, 183, -1, 190, 197 },
+        levelNeededToUnlockPattern = { 0, 0, 0, -1, 7, -1, -1, 10, 13, 17, -1, 26, -1, 37, 50, 64, 78, -1, 92, -1, 106, 120, 134, 148, -1 },
+        levelNeededToUnlockEffect = { 0, 0, 0, 7, 13, 21, 31, 43, 50, 57, 64 },
+        levelNeededToUnlockHighlight = { 0, 0, 0, 5, 5, 5, 10, 10, 17, 17, 21, 21, 26, 26, 31, 31, 37, 37, 43, 57, 71, 85, 99, 106, 113, 120, 127, 134, 141, 148, 155, 162, 169, 176, 183, 190, 197, 204, 204, 211, 211, 218, 218, 225, 225, 232, 232, 239, 239, 239 };
 
     internal List<int> orderToShowPupils = new() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45 },
         orderToShowPattern = new() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 },
         orderToShowEffects = new() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
         orderToShowHighlights = new() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49 };
+
+    internal List<ColorDetail> colorDetails = new();
+    internal string ShareMessage = "Unleash your creativity and color the world! 🎮In this mind-bending game, mix and match lenses of all colors to customize character’s eyes!" +
+                      "\n\nAndroid : " + androidShareLink +
+                     "\n\nIPhone : " + iPhoneShareLink;
 
     internal App_Detail app_Detail = new App_Detail();
 
@@ -117,19 +122,20 @@ public class GeneralDataManager : MonoBehaviour
             UnlockedImages = new() { new(), new(), new(), new(), new(), new(), new() };
             ListOfColorsUsedInLevel = new();
             ListOfCharacterPlayedInLevel = new();
-            UnlockedPenIndexes = new() { 0, 1, 2, 3 };
-            UnlockedLensIndexes = new() { 0, 1, 2, 3 };
-            ShopPrices = new() { 200, 200, 200, 200 };
+            UnlockedPenIndexes = new() { 0 };
+            UnlockedLensIndexes = new() { 0 };
+            UnlockedClickParticleIndexes = new() { -1 };
+            ShopPrices = new() { 200, 200, 200, 200, -1 };
             PlayerPrefs.SetString("LastRatePopupShowDate", DateTime.Now.AddDays(-1).ToString("dd/MM/yyyy", CultureInfo.InvariantCulture));
             DailyRewardClaimedDate = DateTime.Now.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
             try
             {
-                if (Directory.Exists(Application.persistentDataPath + "/Eyes"))
+                if (Directory.Exists(Application.persistentDataPath + "/.Eyes"))
                 {
-                    File.SetAttributes(Application.persistentDataPath + "/Eyes", FileAttributes.Normal);
-                    Directory.Delete(Application.persistentDataPath + "/Eyes", true);
+                    File.SetAttributes(Application.persistentDataPath + "/.Eyes", FileAttributes.Normal);
+                    Directory.Delete(Application.persistentDataPath + "/.Eyes", true);
                 }
-                Directory.CreateDirectory(Application.persistentDataPath + "/Eyes");
+                Directory.CreateDirectory(Application.persistentDataPath + "/.Eyes");
             }
             catch (Exception ex) { }
         }
@@ -148,6 +154,13 @@ public class GeneralDataManager : MonoBehaviour
         if (app_Detail == null) app_Detail = new App_Detail();
         iPhoneShareLink = "itms-apps://itunes.apple.com/app/id" + app_Detail.iPhoneID;
         androidShareLink = "https://play.google.com/store/apps/details?id=" + app_Detail.AndroidID;
+
+        Invoke(nameof(LoadColorNames), 3f);
+    }
+
+    private void LoadColorNames()
+    {
+        colorDetails = JsonConvert.DeserializeObject<List<ColorDetail>>(Resources.Load<TextAsset>("ColorNames").text);
     }
 
     internal static int SelectedPenIndex
@@ -198,6 +211,12 @@ public class GeneralDataManager : MonoBehaviour
         set { PlayerPrefs.SetInt(nameof(SelectedHighlightIndex), value); }
     }
 
+    internal static int SelectedClickParticleIndex
+    {
+        get { return PlayerPrefs.GetInt(nameof(SelectedClickParticleIndex), -1); }
+        set { PlayerPrefs.SetInt(nameof(SelectedClickParticleIndex), value); }
+    }
+
     /*internal static int AutoStretchPowerCount
     {
         get { return PlayerPrefs.GetInt(nameof(AutoStretchPowerCount), 3); }
@@ -238,6 +257,12 @@ public class GeneralDataManager : MonoBehaviour
     {
         get { return JsonConvert.DeserializeObject<List<int>>(PlayerPrefs.GetString(nameof(UnlockedPenIndexes))); }
         set { PlayerPrefs.SetString(nameof(UnlockedPenIndexes), JsonConvert.SerializeObject(value)); }
+    }
+
+    internal static List<int> UnlockedClickParticleIndexes
+    {
+        get { return JsonConvert.DeserializeObject<List<int>>(PlayerPrefs.GetString(nameof(UnlockedClickParticleIndexes))); }
+        set { PlayerPrefs.SetString(nameof(UnlockedClickParticleIndexes), JsonConvert.SerializeObject(value)); }
     }
 
     internal static List<int> UnlockedLensIndexes
@@ -288,10 +313,10 @@ public class GeneralDataManager : MonoBehaviour
         set => PlayerPrefs.SetInt(nameof(UserAlreadyGiveRating), value ? 1 : 0);
     }
 
-    internal static string AdRemoveSaveData
+    internal static string Shop_Saved_Data
     {
-        get { return PlayerPrefs.GetString(nameof(AdRemoveSaveData), ""); }
-        set { PlayerPrefs.SetString(nameof(AdRemoveSaveData), value); }
+        get { return PlayerPrefs.GetString(nameof(Shop_Saved_Data), ""); }
+        set { PlayerPrefs.SetString(nameof(Shop_Saved_Data), value); }
     }
 
     internal static string DailyRewardClaimedDate
@@ -330,4 +355,10 @@ public class CharacterDetails
     public Vector3 leftEyeCanvasPos, rightEyeCanvasPos;
     public Vector3 bodyPos;
     public float bodyScale;
+}
+
+public class ColorDetail
+{
+    public string subtitle;
+    public string hex;
 }

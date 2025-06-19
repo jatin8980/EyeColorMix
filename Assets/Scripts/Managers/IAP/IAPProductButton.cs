@@ -6,19 +6,23 @@ using System;
 
 public class IAPProductButton : MonoBehaviour
 {
-    //public TextMeshProUGUI titleText, oldPriceText, priceText, offerNameText;
+    public TextMeshProUGUI titleText/*, oldPriceText, offerNameText*/;
+    [SerializeField] private Text priceText;
     //Je rite file ma reward ni index set kari 6 te rite karvi.
-    /*[Header("Put text here in same order of data.")]
-    public TextMeshProUGUI[] rewardTexts;*/
+    [Header("Put text here in same order of data.")]
+    public TextMeshProUGUI[] rewardTexts;
 
     private void Start()
     {
         this.GetComponent<Button>().onClick.AddListener(OnClicked);
     }
+
     private void OnClicked()
     {
         if (Application.internetReachability != NetworkReachability.NotReachable)
         {
+            StorePopUp.Inst.LoaderSetActive(true);
+            AdsManager.Inst.CanShowAppOpen = false;
             IAPManager.inst.BuyProduct(IAPManager.inst.productIDs[int.Parse(this.name)]);
         }
         else
@@ -27,7 +31,7 @@ public class IAPProductButton : MonoBehaviour
         }
     }
 
-    /*public void Update_IAP_Button()
+    public void Update_IAP_Button()
     {
         IAPManager.IAPItem iAPItem = IAPManager.inst.iAPSavedDataDictonary[IAPManager.inst.productIDs[int.Parse(this.name)]];
         if (titleText != null)
@@ -39,17 +43,17 @@ public class IAPProductButton : MonoBehaviour
                 rewardTexts[i].text = iAPItem.rewards.ElementAt(i).Value.ToString();
         }
 
-        if (offerNameText != null)
+        priceText.text = iAPItem.price;
+
+        /*if (offerNameText != null)
         {
             if (iAPItem.offerName.Contains("Null"))
                 offerNameText.transform.parent.gameObject.SetActive(false);
             else
                 offerNameText.text = iAPItem.offerName;
-        }
+        }*/
 
-        priceText.text = iAPItem.price;
-
-        if (oldPriceText != null && iAPItem.offerPr > 0)
+        /*if (oldPriceText != null && iAPItem.offerPr > 0)
         {
             string priceString = priceText.text;
             priceString = String.Concat(priceString.Where(c => !Char.IsWhiteSpace(c)));
@@ -74,6 +78,6 @@ public class IAPProductButton : MonoBehaviour
             float storePrice = float.Parse(String.Format("{0:0.00}", stringStorePrice));
             float oldPrice = (storePrice * 100f) / (100f - iAPItem.offerPr);
             oldPriceText.text = currencySign + String.Format("{0:0.00}", oldPrice);
-        }
-    }*/
+        }*/
+    }
 }

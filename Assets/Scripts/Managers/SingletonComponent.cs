@@ -3,7 +3,7 @@
 public class SingletonComponent<T> : MonoBehaviour where T : Object
 {
     private static T _instance;
-    public static T Inst => _instance ? _instance : FindObjectOfType<T>();
+    public static T Inst => _instance ? _instance : FindAnyObjectByType<T>();
 
     protected virtual void Awake()
     {

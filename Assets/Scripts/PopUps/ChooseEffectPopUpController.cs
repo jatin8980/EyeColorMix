@@ -9,17 +9,17 @@ public class ChooseEffectPopUpController : MonoBehaviour
     {
         RectTransform bgRt = transform.GetChild(0).GetComponent<RectTransform>();
         bgRt.anchoredPosition = new Vector2(0, -50);
-        RefreshForNativeAd();
+        RefreshForAd();
         patternLockOb.SetActive(GeneralDataManager.Level < 3);
     }
 
-    internal void RefreshForNativeAd()
+    internal void RefreshForAd()
     {
         RectTransform rt = transform.GetChild(0).GetComponent<RectTransform>();
         rt.DOKill();
-        if (AdsManager.Inst.isNativeAdLoaded)
+        if (AdsManager.Inst.isBannerLoaded)
         {
-            rt.DOAnchorPosY(870f, 0.2f);
+            rt.DOAnchorPosY(710f + GameManager.Inst.bannerHeight, 0.2f);
         }
         else
         {

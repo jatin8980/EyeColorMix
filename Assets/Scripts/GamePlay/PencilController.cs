@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,6 +11,11 @@ public class PencilController : MonoBehaviour
     private Coroutine moveCoroutine;
     private List<Vector3> defaultPoses = new();
     private bool isMovingDone;
+    private RectTransform thisRT;
+    private void Awake()
+    {
+        thisRT = GetComponent<RectTransform>();
+    }
 
     private void Update()
     {
@@ -44,11 +50,13 @@ public class PencilController : MonoBehaviour
     private IEnumerator MoveToTargetCoroutine(float duration)
     {
         float time = 0;
-
+        thisRT.DOKill();
+        Vector3 startPos = pencilRT.position;
         while (time < duration)
         {
             time += Time.deltaTime;
-            pencilRT.position = Vector3.Lerp(pencilRT.position, smoothTargetPos, time / duration);
+            thisRT.anchoredPosition = new Vector2(Mathf.Lerp(thisRT.anchoredPosition.x, -152, time / duration), Mathf.Lerp(thisRT.anchoredPosition.y, 190, time / duration));
+            pencilRT.position = Vector3.Lerp(startPos, smoothTargetPos, time / duration);
             SetRotation();
             yield return null;
         }
@@ -73,6 +81,8 @@ public class PencilController : MonoBehaviour
     {
         if (moveCoroutine != null)
             StopCoroutine(moveCoroutine);
+        thisRT.DOKill();
+        thisRT.DOAnchorPos(new Vector2(-72, 527), 0.2f);
         moveCoroutine = StartCoroutine(MoveDefaultCoroutine());
         isMovingDone = false;
     }
@@ -81,7 +91,7 @@ public class PencilController : MonoBehaviour
     {
         if (moveCoroutine != null)
             StopCoroutine(moveCoroutine);
-        moveCoroutine = StartCoroutine(MoveToTargetCoroutine(0.5f));
+        moveCoroutine = StartCoroutine(MoveToTargetCoroutine(0.2f));
         isMovingDone = false;
     }
 

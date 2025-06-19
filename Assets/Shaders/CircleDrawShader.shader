@@ -1,19 +1,4 @@
-﻿
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Shader "Custom/CircleDrawingShader"
+﻿Shader "Custom/CircleDrawingShader"
 {
     Properties
     {

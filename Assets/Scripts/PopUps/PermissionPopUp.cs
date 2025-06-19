@@ -13,6 +13,7 @@ public class PermissionPopUp : MonoBehaviour
 
     public void Settings_Btn_Click()
     {
+        AdsManager.Inst.CanShowAppOpen = false;
         using var unityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         using var currentActivityObject = unityClass.GetStatic<AndroidJavaObject>("currentActivity");
         var packageName = currentActivityObject.Call<string>("getPackageName");

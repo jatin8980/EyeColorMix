@@ -1,6 +1,8 @@
 using DG.Tweening;
 using Mosframe;
 using System.Collections.Generic;
+using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,7 +19,6 @@ public class ChooseImagePopUpController : MonoBehaviour
     private List<int> totalImagesPerCatetory = new() { 20, 18, 20, 20, 20, 21, 20 };
     private List<bool> isAlreadyShuffled = new() { false, false, false, false, false, false, false };
     private Color32 defaultColor = new(147, 147, 147, 255), selectedColor = new(80, 80, 80, 255);
-
     private void Awake()
     {
         Inst = this;
@@ -27,8 +28,7 @@ public class ChooseImagePopUpController : MonoBehaviour
     {
         RectTransform rt = imageScrollView.GetComponent<RectTransform>();
         rt.anchoredPosition = new Vector2(rt.anchoredPosition.x, -50);
-        RefreshForNativeAd();
-        GameManager.Inst.SetActiveCoins(false);
+        RefreshForAd();
 
         lockedByAdImages.Add(new() { 2, 3, 6, 8, 11, 15, 16, 17 });//imageIndex
         lockedByAdImages.Add(new() { 1, 3, 5, 6, 8, 9, 10, 12 });
@@ -52,7 +52,7 @@ public class ChooseImagePopUpController : MonoBehaviour
         GameManager.Inst.homeScreen.characterTR.DOKill();
         GameManager.Inst.homeScreen.characterTR.DOScale(GameManager.Inst.homeScreen.CharacterScale(), 0.5f);
         GameManager.Inst.homeScreen.characterTR.DOLocalMove(new Vector3(0, GameManager.Inst.homeScreen.CharacterScale() - 1f, 0), 0.5f);
-        GameManager.Inst.SetActiveCoins(true);
+        GameManager.Inst.homeScreen.HideMessage();
     }
 
     private void ShuffleOrderToShowForCurrentCategory()
@@ -67,6 +67,27 @@ public class ChooseImagePopUpController : MonoBehaviour
             int index = Random.Range(0, unshuffledOrder.Count);
             orderToShowImage[selectedCategoryIndex].Add(unshuffledOrder[index]);
             unshuffledOrder.RemoveAt(index);
+        }
+        //first two item will not have lock.
+        for (int i = 0; i <= 1; i++)
+        {
+            if (lockedByAdImages[selectedCategoryIndex].Contains(orderToShowImage[selectedCategoryIndex][i])
+                && !unlockedImages[selectedCategoryIndex].Contains(orderToShowImage[selectedCategoryIndex][i]))
+            {
+                List<int> withoutLockIndexs = new();
+                for (int j = i + 1; j < orderToShowImage[selectedCategoryIndex].Count; j++)
+                {
+                    if (!lockedByAdImages[selectedCategoryIndex].Contains(orderToShowImage[selectedCategoryIndex][j]) ||
+                        unlockedImages[selectedCategoryIndex].Contains(orderToShowImage[selectedCategoryIndex][j]))
+                    {
+                        withoutLockIndexs.Add(j);
+                    }
+                }
+                int withoutLockIndex = withoutLockIndexs[Random.Range(0, withoutLockIndexs.Count)];
+                int oldImageIndex = orderToShowImage[selectedCategoryIndex][i];
+                orderToShowImage[selectedCategoryIndex][i] = orderToShowImage[selectedCategoryIndex][withoutLockIndex];
+                orderToShowImage[selectedCategoryIndex][withoutLockIndex] = oldImageIndex;
+            }
         }
     }
 
@@ -85,11 +106,10 @@ public class ChooseImagePopUpController : MonoBehaviour
         };
     }
 
-    internal void UnlockImageCallBack()
+    internal void UnlockImage()
     {
         unlockedImages[selectedCategoryIndex].Add(imageIndexToUnlock);
         GeneralDataManager.UnlockedImages = unlockedImages;
-        GameManager.Inst.Show_Toast("Image unlocked!");
         imageScrollView.refresh();
     }
 
@@ -100,13 +120,13 @@ public class ChooseImagePopUpController : MonoBehaviour
         GameManager.Inst.HidePopUp(gameObject);
     }
 
-    internal void RefreshForNativeAd()
+    internal void RefreshForAd()
     {
         RectTransform rt = imageScrollView.GetComponent<RectTransform>();
         rt.DOKill();
-        if (AdsManager.Inst.isNativeAdLoaded)
+        if (AdsManager.Inst.isBannerLoaded)
         {
-            rt.DOAnchorPosY(565f, 0.2f);
+            rt.DOAnchorPosY(395f + GameManager.Inst.bannerHeight, 0.2f);
         }
         else
         {
@@ -158,6 +178,7 @@ public class ChooseImagePopUpController : MonoBehaviour
         if (NativeGallery.CheckPermission(NativeGallery.PermissionType.Read, NativeGallery.MediaType.Image) !=
            NativeGallery.Permission.Granted)
         {
+            AdsManager.Inst.SetThreadBlockTrue();
             NativeGallery.Permission permissionStatus = NativeGallery.RequestPermission(NativeGallery.PermissionType.Read, NativeGallery.MediaType.Image);
             if (permissionStatus != NativeGallery.Permission.Granted)
             {
@@ -166,16 +187,14 @@ public class ChooseImagePopUpController : MonoBehaviour
                     //User choose dont ask again option, you can show popup here for instructions to allow permission from setting/appinfo
                     GameManager.Inst.Show_Popup(GameManager.Popups.Permission, false);
                 }
-                //Debug.LogError("No Permission!");
                 return;
             }
         }
-
+        AdsManager.Inst.CanShowAppOpen = false;
         NativeGallery.GetImageFromGallery(path =>
         {
             if (path == null)
             {
-                //Debug.LogError("Path null");
                 return;
             }
 
@@ -183,7 +202,6 @@ public class ChooseImagePopUpController : MonoBehaviour
 
             if (texture == null)
             {
-                //Debug.LogError("null texture");
                 return;
             }
 

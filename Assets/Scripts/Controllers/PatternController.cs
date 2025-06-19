@@ -7,19 +7,25 @@ using UnityEngine.UI;
 
 public class PatternController : MonoBehaviour
 {
-    [SerializeField] private RectTransform contentRT, colorHandleRT, leftBottomRT;
+    [SerializeField] private RectTransform contentRT, colorHandleRT;
     internal static PatternController Inst;
     internal int selectedPatternIndex = -1, selectedPatternIndexForUnlock;
     internal List<PatternItem> patternItems = new();
-    [SerializeField] private Slider amountSlider, colorSlider;
-    [SerializeField] private TextMeshProUGUI amountSliderText;
-    [SerializeField] private Image colorSliderHandleImg, hueImage;
+    [SerializeField] private Slider amountSlider, colorSlider, opacitySlider;
+    [SerializeField] private Texture2D hueTexture;
+    [SerializeField] private Image opacityImage;
     internal List<int> unlockedPatterns;
-
 
     private void Awake()
     {
         Inst = this;
+        RectTransform sliderParentRT = amountSlider.transform.parent.GetComponent<RectTransform>();
+        if (sliderParentRT.rect.width > 900)
+        {
+            float diff = sliderParentRT.rect.width - 900;
+            sliderParentRT.offsetMax = new Vector2(-diff / 2f, sliderParentRT.offsetMax.y);
+            sliderParentRT.offsetMin = new Vector2(diff / 2f, sliderParentRT.offsetMin.y);
+        }
     }
 
     internal void OnEnable()
@@ -41,7 +47,9 @@ public class PatternController : MonoBehaviour
         if (selectedPatternIndex == -1)
             selectedPatternIndex = GeneralDataManager.Inst.orderToShowPattern[0];
 
-        rt.DOAnchorPosY(AdsManager.Inst.isNativeAdLoaded ? 707f : 537f, 0.3f);
+        float y = AdsManager.Inst.isBannerLoaded ? 537f + GameManager.Inst.bannerHeight : 537f;
+        rt.DOAnchorPosY(y, 0.3f);
+        GameManager.Inst.gamePlayUi.nextBtnParentRT.anchoredPosition = new Vector2(0, y + 100);
 
         ApplyPattern(selectedPatternIndex);
 
@@ -64,18 +72,13 @@ public class PatternController : MonoBehaviour
         }
     }
 
-    internal void RefreshForNativeAd()
+    internal void RefreshForAd()
     {
         RectTransform rt = GetComponent<RectTransform>();
         rt.DOKill();
-        if (AdsManager.Inst.isNativeAdLoaded)
-        {
-            rt.DOAnchorPosY(707f, 0.2f);
-        }
-        else
-        {
-            rt.DOAnchorPosY(537f, 0.2f);
-        }
+        float y = AdsManager.Inst.isBannerLoaded ? 537f + GameManager.Inst.bannerHeight : 537f;
+        rt.DOAnchorPosY(y, 0.2f);
+        GameManager.Inst.gamePlayUi.nextBtnParentRT.anchoredPosition = new Vector2(0, y + 100);
     }
 
     internal void ApplyPattern(int patternIndex)
@@ -90,21 +93,19 @@ public class PatternController : MonoBehaviour
         if (patternIndex == -1)
         {
             GameManager.Inst.gamePlayUi.patternGameScrollView.gameObject.SetActive(false);
-            amountSlider.interactable = colorSlider.interactable = false;
+            amountSlider.interactable = colorSlider.interactable = opacitySlider.interactable = false;
             amountSlider.minValue = 0;
             amountSlider.maxValue = 2;
             amountSlider.value = 0;
             colorSlider.value = 0;
-            colorSliderHandleImg.color = Color.white;
-            amountSliderText.gameObject.SetActive(false);
+            opacitySlider.value = 0;
         }
         else
         {
             PatternData patternData = Resources.Load<PatternData>("ScriptableObjects/PatternData/" + patternIndex);
             GameManager.Inst.gamePlayUi.patternGameScrollView.SetSprites(patternData);
             GameManager.Inst.gamePlayUi.patternGameScrollView.gameObject.SetActive(true);
-            amountSlider.interactable = true;
-            colorSlider.interactable = true;
+            amountSlider.interactable = colorSlider.interactable = opacitySlider.interactable = true;
             amountSlider.maxValue = patternData.maxSliderValue;
             amountSlider.minValue = patternData.minSliderValue;
             if (amountSlider.value == patternData.defaultValue)
@@ -116,13 +117,14 @@ public class PatternController : MonoBehaviour
                 amountSlider.value = patternData.defaultValue;
             }
             colorSlider.value = 0;
-            amountSliderText.gameObject.SetActive(true);
+            opacitySlider.value = 0;
         }
 
         if (!GeneralDataManager.IsPatternTutorialShowed)
         {
             amountSlider.value = amountSlider.minValue;
-            Transform handleRt = amountSlider.transform.GetChild(2).GetChild(0);
+            Transform handleRt = amountSlider.transform.GetChild(1).GetChild(0);
+            UserTutorialController.Inst.handRT.position = handleRt.position;
             UserTutorialController.Inst.SetActiveHand(true);
             amountSlider.DOValue(amountSlider.maxValue, 3).SetLoops(-1, LoopType.Yoyo).SetEase(Ease.Linear).OnUpdate(() =>
             {
@@ -156,18 +158,23 @@ public class PatternController : MonoBehaviour
             return;
 
         GameManager.Inst.gamePlayUi.patternGameScrollView.SetAmount((int)amountSlider.value);
-        amountSliderText.text = amountSlider.value.ToString();
 
     }
 
     public void On_ColorSlider_Value_Change()
     {
-        leftBottomRT.position = colorHandleRT.position;
-        float per = leftBottomRT.anchoredPosition.x / hueImage.GetComponent<RectTransform>().rect.width;
-        Color color = hueImage.sprite.texture.GetPixel(Mathf.FloorToInt(hueImage.sprite.texture.width * per), 2);
-        colorSliderHandleImg.color = color;
-        GameManager.Inst.gamePlayUi.patternGameScrollView.SetImageColor(color);
+        opacityImage.color = hueTexture.GetPixel(Mathf.FloorToInt(hueTexture.width * colorSlider.value), 2);
+        GameManager.Inst.gamePlayUi.patternGameScrollView.SetImageColor(opacityImage.color);
         if ((int)(colorSlider.value * 100) % 10 == 0)
+        {
+            SoundManager.Inst.LightVibrate();
+        }
+    }
+
+    public void On_OpacitySlider_Value_Change()
+    {
+        GameManager.Inst.gamePlayUi.patternGameScrollView.SetOpacity(1 - opacitySlider.value);
+        if ((int)(opacitySlider.value * 100) % 10 == 0)
         {
             SoundManager.Inst.LightVibrate();
         }

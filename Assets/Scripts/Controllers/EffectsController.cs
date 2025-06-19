@@ -22,6 +22,13 @@ public class EffectsController : MonoBehaviour
     private void Awake()
     {
         Inst = this;
+        RectTransform sliderParentRT = effectSlider.transform.parent.GetComponent<RectTransform>();
+        if (sliderParentRT.rect.width > 900)
+        {
+            float diff = sliderParentRT.rect.width - 900;
+            sliderParentRT.offsetMax = new Vector2(-diff / 2f, sliderParentRT.offsetMax.y);
+            sliderParentRT.offsetMin = new Vector2(diff / 2f, sliderParentRT.offsetMin.y);
+        }
     }
 
     private void Start()
@@ -43,8 +50,9 @@ public class EffectsController : MonoBehaviour
 
         if (selectedEffectIndex == -1)
             selectedEffectIndex = GeneralDataManager.Inst.orderToShowEffects[0];
-
-        rt.DOAnchorPosY(AdsManager.Inst.isNativeAdLoaded ? 665f : 495f, 0.3f);
+        float y = AdsManager.Inst.isBannerLoaded ? 537f + GameManager.Inst.bannerHeight : 537f;
+        rt.DOAnchorPosY(y, 0.3f);
+        GameManager.Inst.gamePlayUi.nextBtnParentRT.anchoredPosition = new Vector2(0, y + 100);
         effectSlider.value = 0;
         ApplyEffect(selectedEffectIndex);
 
@@ -68,18 +76,13 @@ public class EffectsController : MonoBehaviour
         }
     }
 
-    internal void RefreshForNativeAd()
+    internal void RefreshForAd()
     {
         RectTransform rt = GetComponent<RectTransform>();
         rt.DOKill();
-        if (AdsManager.Inst.isNativeAdLoaded)
-        {
-            rt.DOAnchorPosY(665f, 0.2f);
-        }
-        else
-        {
-            rt.DOAnchorPosY(495f, 0.2f);
-        }
+        float y = AdsManager.Inst.isBannerLoaded ? 537f + GameManager.Inst.bannerHeight : 537f;
+        rt.DOAnchorPosY(y, 0.2f);
+        GameManager.Inst.gamePlayUi.nextBtnParentRT.anchoredPosition = new Vector2(0, y + 100);
     }
 
     internal void ApplyEffect(int effectIndex)
@@ -197,6 +200,7 @@ public class EffectsController : MonoBehaviour
             {
                 effectSlider.DOKill();
                 Transform handleRt = effectSlider.transform.GetChild(1).GetChild(0);
+                UserTutorialController.Inst.handRT.position = handleRt.position;
                 UserTutorialController.Inst.SetActiveHand(true);
                 effectSlider.DOValue(100, 3).SetLoops(-1, LoopType.Yoyo).SetEase(Ease.Linear).OnUpdate(() =>
                 {

@@ -17,7 +17,7 @@ public class AdLoaderPanelController : MonoBehaviour
     {
         CancelInvoke(nameof(Disable_Panel));
         if (GameManager.activePopUps.Contains(GameManager.Popups.LevelCompletePopUp) &&
-            !GameManager.activePopUps.Contains(GameManager.Popups.FreeCoinsPopUp))
+            !GameManager.activePopUps.Contains(GameManager.Popups.StorePopUp))
             GameManager.Inst.homeScreen.SetActiveEye(true);
     }
 }

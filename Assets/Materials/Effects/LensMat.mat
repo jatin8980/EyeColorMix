@@ -47,10 +47,11 @@ Material:
     - _MoveAmount: -2
     - _MoveRadius: 0.1
     - _StretchAmount: 0
-    - _SuckAmount: -0.25
+    - _SuckAmount: -0
     - _SuckRadius: 0.45
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1

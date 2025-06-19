@@ -247,7 +247,7 @@ public class DrawScript : MonoBehaviour
     {
         if (GameController.Inst.currentCircleIndex == 3)
         {
-            GameManager.Inst.gamePlayUi.NextBtnActiveSelf(true);
+            GameManager.Inst.gamePlayUi.NextBtnActiveSelf(true, true);
             borderRT.gameObject.SetActive(false);
             pencilColliderRT.gameObject.SetActive(false);
             if (UserTutorialController.Inst != null)
@@ -256,11 +256,16 @@ public class DrawScript : MonoBehaviour
                 GeneralDataManager.TutorialStep++;// to 4
                 GameManager.Inst.Show_Popup(GameManager.Popups.TutorialPopUp);
             }
+            borderRT.DOKill();
+            borderRT.sizeDelta = new(887, 887);
         }
         else
         {
             GameController.Inst.currentCircleIndex++;
             On_Circle_Change();
+            Color selectedColor = GameManager.Inst.gamePlayUi.colorSelector.GetSelectedColor();
+            selectedColor = new Color(Mathf.Min(selectedColor.r + 0.1f, 0.9f), Mathf.Min(selectedColor.g + 0.1f, 0.9f), Mathf.Min(selectedColor.b + 0.1f, 0.9f), 1);
+            GameManager.Inst.gamePlayUi.colorSelector.SetSelectedColor(selectedColor);
         }
     }
 
@@ -278,7 +283,7 @@ public class DrawScript : MonoBehaviour
         switch (GameController.Inst.currentCircleIndex)
         {
             case 0:
-                borderRT.DOSizeDelta(new(864, 864), 0.5f).SetEase(Ease.OutBack);
+                borderRT.DOSizeDelta(new(887, 887), 0.5f).SetEase(Ease.OutBack);
                 break;
             case 1:
                 borderRT.DOSizeDelta(new(648, 648), 0.5f).SetEase(Ease.OutBack);

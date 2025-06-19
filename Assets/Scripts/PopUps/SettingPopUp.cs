@@ -72,11 +72,6 @@ public class SettingPopUp : MonoBehaviour
         GameManager.Inst.HidePopUp(gameObject);
     }
 
-    public void On_Remove_Ads_Btn_Click()
-    {
-        GameManager.Inst.Show_Popup(GameManager.Popups.RemoveAdsPopUp);
-    }
-
     public void On_CheckBox_Btn_Click()
     {
         GeneralDataManager.IsChoiceSave = !GeneralDataManager.IsChoiceSave;
@@ -100,24 +95,21 @@ public class SettingPopUp : MonoBehaviour
 
     private static void Share_Game()
     {
-        string ShareMessage = "Unleash your creativity and color the world! 🎮In this mind-bending game, mix and match lenses of all colors to customize character’s eyes!" +
-                              "\n\nAndroid : " + GeneralDataManager.androidShareLink +
-                             "\n\nIPhone : " + GeneralDataManager.iPhoneShareLink;
-
+        AdsManager.Inst.CanShowAppOpen = false;
 #if UNITY_ANDROID
         var intentClass = new AndroidJavaClass("android.content.Intent");
         var intentObject = new AndroidJavaObject("android.content.Intent");
 
         intentObject.Call<AndroidJavaObject>("setAction", intentClass.GetStatic<string>("ACTION_SEND"));
         intentObject.Call<AndroidJavaObject>("setType", "text/plain");
-        intentObject.Call<AndroidJavaObject>("putExtra", intentClass.GetStatic<string>("EXTRA_TEXT"), ShareMessage);
+        intentObject.Call<AndroidJavaObject>("putExtra", intentClass.GetStatic<string>("EXTRA_TEXT"), GeneralDataManager.Inst.ShareMessage);
 
         var unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         var currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
         var chooser = intentClass.CallStatic<AndroidJavaObject>("createChooser", intentObject, "Share your high score");
         currentActivity.Call("startActivity", chooser);
 #elif UNITY_IOS
-            NativeShare.Share(ShareMessage);
+            NativeShare.Share(GeneralDataManager.Inst.ShareMessage);
 #endif
     }
     #endregion

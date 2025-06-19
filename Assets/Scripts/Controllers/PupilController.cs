@@ -2,10 +2,13 @@ using DG.Tweening;
 using Mosframe;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PupilController : MonoBehaviour
 {
     [SerializeField] private RectTransform contentRT;
+    [SerializeField] private Slider slider;
+    [SerializeField] private Material fadeOutlineMaterial;
     internal static PupilController Inst;
     internal int selectedPupilIndex = -1, selectedPupilIndexForUnlock;
     internal List<PupilItem> pupilItems = new();
@@ -14,6 +17,14 @@ public class PupilController : MonoBehaviour
     private void Awake()
     {
         Inst = this;
+        fadeOutlineMaterial.SetFloat("_BlurAmount", 0f);
+        RectTransform sliderParentRT = slider.transform.parent.GetComponent<RectTransform>();
+        if (sliderParentRT.rect.width > 900)
+        {
+            float diff = sliderParentRT.rect.width - 900;
+            sliderParentRT.offsetMax = new Vector2(-diff / 2f, sliderParentRT.offsetMax.y);
+            sliderParentRT.offsetMin = new Vector2(diff / 2f, sliderParentRT.offsetMin.y);
+        }
     }
 
     internal void OnEnable()
@@ -29,7 +40,8 @@ public class PupilController : MonoBehaviour
         else
             selectedPupilIndex = GeneralDataManager.Inst.orderToShowPupils[0];
 
-        rt.DOAnchorPosY(AdsManager.Inst.isNativeAdLoaded ? 565f : 395, 0.3f).OnComplete(() =>
+        float y = AdsManager.Inst.isBannerLoaded ? 537f + GameManager.Inst.bannerHeight : 537f;
+        rt.DOAnchorPosY(y, 0.3f).OnComplete(() =>
         {
             if (UserTutorialController.Inst != null)
             {
@@ -38,7 +50,7 @@ public class PupilController : MonoBehaviour
                 UserTutorialController.Inst.handRT.anchoredPosition += new Vector2(110, 0);
             }
         });
-
+        GameManager.Inst.gamePlayUi.nextBtnParentRT.anchoredPosition = new Vector2(0, y + 100);
         if (UserTutorialController.Inst == null)
         {
             GameManager.Inst.gamePlayUi.RefreshPupil(selectedPupilIndex);
@@ -46,6 +58,7 @@ public class PupilController : MonoBehaviour
         else
         {
             selectedPupilIndex = -1;
+            slider.value = 0;
             return;
         }
 
@@ -84,31 +97,26 @@ public class PupilController : MonoBehaviour
         }
     }
 
-    internal void RefreshForNativeAd()
+    internal void ResetSlider() => slider.value = 0;
+
+    internal void RefreshForAd()
     {
         RectTransform rt = GetComponent<RectTransform>();
         rt.DOKill();
-        if (AdsManager.Inst.isNativeAdLoaded)
+        float y = AdsManager.Inst.isBannerLoaded ? 537f + GameManager.Inst.bannerHeight : 537f;
+        rt.DOAnchorPosY(y, 0.2f).OnComplete(() =>
         {
-            rt.DOAnchorPosY(565f, 0.2f).OnComplete(() =>
+            if (UserTutorialController.Inst != null)
             {
-                if (UserTutorialController.Inst != null)
-                {
-                    UserTutorialController.Inst.handRT.position = contentRT.GetChild(1).position;
-                    UserTutorialController.Inst.handRT.anchoredPosition += new Vector2(110, 0);
-                }
-            });
-        }
-        else
-        {
-            rt.DOAnchorPosY(395f, 0.2f).OnComplete(() =>
-            {
-                if (UserTutorialController.Inst != null)
-                {
-                    UserTutorialController.Inst.handRT.position = contentRT.GetChild(1).position;
-                    UserTutorialController.Inst.handRT.anchoredPosition += new Vector2(110, 0);
-                }
-            });
-        }
+                UserTutorialController.Inst.handRT.position = contentRT.GetChild(1).position;
+                UserTutorialController.Inst.handRT.anchoredPosition += new Vector2(110, 0);
+            }
+        });
+        GameManager.Inst.gamePlayUi.nextBtnParentRT.anchoredPosition = new Vector2(0, y + 100);
+    }
+
+    public void On_SliderValue_Change()
+    {
+        fadeOutlineMaterial.SetFloat("_BlurAmount", slider.value);
     }
 }

@@ -33,10 +33,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _LineWidth: 0.05
+    - _LineWidth: 0.2
     m_Colors:
-    - _LineColor: {r: 0.5686275, g: 0.5686275, b: 0.63529414, a: 1}
-    - _TexturePos: {r: 0.5792482, g: 0.76256895, b: 0, a: 0}
-    - _TexturePos2: {r: 0.5709255, g: 0.7434236, b: 0, a: 0}
+    - _LineColor: {r: 0.9, g: 0.48431373, b: 0.41764706, a: 1}
+    - _TexturePos: {r: 0.88711447, g: 0.7632576, b: 0, a: 0}
+    - _TexturePos2: {r: 0.8421012, g: 0.68223387, b: 0, a: 0}
     - _sPos: {r: 945.5, g: 807.5, b: 0, a: 0}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1

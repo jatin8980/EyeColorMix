@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Purchasing;
+using UnityEngine.Purchasing.Extension;
+using UnityEngine.XR;
 using static GeneralDataManager;
 
 
@@ -14,7 +16,7 @@ using static GeneralDataManager;
 //    }
 
 
-public class IAPManager : MonoBehaviour, IStoreListener
+public class IAPManager : MonoBehaviour, IDetailedStoreListener
 {
     public static IAPManager inst;
 
@@ -103,7 +105,7 @@ public class IAPManager : MonoBehaviour, IStoreListener
 
     public void OnPurchaseFailed(Product product, PurchaseFailureReason failureReason)
     {
-        //FindObjectOfType<ShopPopupManager>()?.loader.SetActive(false);
+        StorePopUp.Inst.LoaderSetActive(false);
         GameManager.Inst.Show_Toast("Purchase Failed!");
         Debug.LogError("Purchase failed for product id: " + product.definition.id + ", reason: " + failureReason);
     }
@@ -139,7 +141,7 @@ public class IAPManager : MonoBehaviour, IStoreListener
 
     private void OnProductPurchases(Product product)
     {
-        //FindObjectOfType<ShopPopupManager>()?.loader.SetActive(false);
+        StorePopUp.Inst.LoaderSetActive(false);
         StartCoroutine(GivePurchasedRewardIAP(product));
     }
 
@@ -152,13 +154,16 @@ public class IAPManager : MonoBehaviour, IStoreListener
         {
             GeneralDataManager.IsPurchaseAdsRemoved = true;
             AdsManager.Inst.RemoveAdsApply();
+            GameManager.Inst.homeScreen.RefreshRemoveAdsBtn();
+            StorePopUp.Inst.RefreshRemoveAdsOb();
+            yield return new WaitForSeconds(0.1f);
+            GameManager.Inst.Show_Toast("Ads Removed Successfully.");
         }
-
-        yield return new WaitForSeconds(0.1f);
-        GameManager.Inst.Show_Toast("Ads Removed Successfully.");
-        FindObjectOfType<RemoveAdsPopUp>()?.On_Close_Btn_Click();
-        GameManager.Inst.gamePlayUi.RefreshRemoveAdsBtn();
-        GameManager.Inst.homeScreen.RefreshRemoveAdsBtn();
+        else if (iAPPurchasedItem.rewards.ContainsKey("coin"))
+        {
+            GeneralDataManager.Coins += iAPPurchasedItem.rewards["coin"];
+            GameManager.Inst.StartCoroutine(StorePopUp.Inst.CollectCoins(iAPSavedDataDictonary.Keys.ToList().IndexOf(productID) + 1));
+        }
     }
 
     /// <summary>
@@ -216,6 +221,7 @@ public class IAPManager : MonoBehaviour, IStoreListener
             if ((Application.platform == RuntimePlatform.IPhonePlayer ||
                  Application.platform == RuntimePlatform.OSXPlayer))
             {
+                AdsManager.Inst.CanShowAppOpen = false;
                 extensionProvider.GetExtension<IAppleExtensions>().RestoreTransactions((result) => { });
             }
             else
@@ -232,8 +238,8 @@ public class IAPManager : MonoBehaviour, IStoreListener
     internal void LoadIAPData(bool loadNew)
     {
         iAPSavedDataDictonary.Clear();
-        if (AdRemoveSaveData != "" && !loadNew)
-            iAPSavedDataDictonary = JsonConvert.DeserializeObject<Dictionary<string, IAPItem>>(AdRemoveSaveData);
+        if (Shop_Saved_Data != "" && !loadNew)
+            iAPSavedDataDictonary = JsonConvert.DeserializeObject<Dictionary<string, IAPItem>>(Shop_Saved_Data);
         else
         {
             iAPSavedDataDictonary = JsonConvert.DeserializeObject<Dictionary<string, IAPItem>>(Resources.Load<TextAsset>("IAP_Details").text);
@@ -245,18 +251,25 @@ public class IAPManager : MonoBehaviour, IStoreListener
                         GetProductInformation(productIDs[i]).metadata.localizedPriceString;
                 }
             }
-            AdRemoveSaveData = iAPSavedDataDictonary.ToString();
+            Shop_Saved_Data = JsonConvert.SerializeObject(iAPSavedDataDictonary);
         }
 
-        if (GameManager.activePopUps.Count > 0 && GameManager.activePopUps.Last() == GameManager.Popups.RemoveAdsPopUp)
+        if (GameManager.activePopUps.Count > 0 && GameManager.activePopUps.Last() == GameManager.Popups.StorePopUp)
         {
-            FindObjectOfType<RemoveAdsPopUp>().SetupPriceText();
+            StorePopUp.Inst.SetupIAPList();
         }
     }
 
-
     public void OnInitializeFailed(InitializationFailureReason error, string message)
     {
-        //throw new System.NotImplementedException();
+        LoadIAPData(false);
+        Debug.LogError("Initializion failed! Reason: " + message);
+    }
+
+    public void OnPurchaseFailed(Product product, PurchaseFailureDescription failureDescription)
+    {
+        StorePopUp.Inst.LoaderSetActive(false);
+        GameManager.Inst.Show_Toast("Purchase Failed!");
+        Debug.LogError("Purchase failed for product id: " + product.definition.id + ", reason: " + failureDescription.reason);
     }
 }

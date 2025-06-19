@@ -25,7 +25,7 @@ public class UserTutorialController : MonoBehaviour
 
         if (!GeneralDataManager.IsPatternTutorialShowed && PatternController.Inst != null && PatternController.Inst.gameObject.activeSelf)
         {
-            ShowPupilTutorial();
+            ShowPatternTutorial();
         }
         else
         {
@@ -77,6 +77,7 @@ public class UserTutorialController : MonoBehaviour
         {
             case 1:
                 GameManager.Inst.gamePlayUi.drawController.gameObject.SetActive(true);
+                GameManager.Inst.gamePlayUi.pencilController.pencilRT.pivot = new Vector2(0.5f, 1f);
                 break;
         }
         t?.Kill();
@@ -137,8 +138,8 @@ public class UserTutorialController : MonoBehaviour
         dummyRT.DOPath(path, 5f, PathType.CatmullRom).SetLoops(-1, LoopType.Restart).SetEase(Ease.Linear).OnUpdate(() =>
         {
             handRT.position = dummyRT.position;
-
         });
+        GameManager.Inst.gamePlayUi.pencilController.pencilRT.pivot = new Vector2(0.49f, 0.997f);
     }
 
     private void StartDrawTutorial()
@@ -173,7 +174,10 @@ public class UserTutorialController : MonoBehaviour
         messageText.text = "Amazing!\nLet's continue";
         SetActiveHand(true);
         handRT.position = GameManager.Inst.gamePlayUi.GetNextButtonPosition();
-        handRT.localEulerAngles = new(0, 0, 40);
+        handRT.anchoredPosition -= new Vector2(100, 0);
+        handRT.localEulerAngles = new(0, 0, -25);
+        messageBgRT.anchorMax = messageBgRT.anchorMin = Vector2.one;
+        messageBgRT.anchoredPosition = new(0, -975 - GameManager.Inst.GetDifferenceFromTop());
     }
 
     private void StartStretchTutorial()
@@ -209,7 +213,10 @@ public class UserTutorialController : MonoBehaviour
         messageText.text = "Perfect!\nLet's continue";
         SetActiveHand(true);
         handRT.position = GameManager.Inst.gamePlayUi.GetNextButtonPosition();
-        handRT.localEulerAngles = new(0, 0, 40);
+        handRT.anchoredPosition -= new Vector2(100, 0);
+        handRT.localEulerAngles = new(0, 0, -25);
+        messageBgRT.anchorMax = messageBgRT.anchorMin = Vector2.one;
+        messageBgRT.anchoredPosition = new(0, -975 - GameManager.Inst.GetDifferenceFromTop());
     }
 
     private void ShowMessageForStep7()
@@ -229,7 +236,7 @@ public class UserTutorialController : MonoBehaviour
 
     private void ShowMessageForStep9()
     {
-        messageText.text = "Drag contact lens onto the right eye";
+        messageText.text = "Drag contact lens onto the left eye";
         SetActiveHand(true);
         handRT.GetComponent<Animation>().enabled = false;
         handRT.GetChild(0).GetComponent<RectTransform>().sizeDelta = handRT.GetChild(1).GetComponent<RectTransform>().sizeDelta = new Vector2(250, 250);
@@ -237,7 +244,7 @@ public class UserTutorialController : MonoBehaviour
 
     private void ShowMessageForStep10()
     {
-        messageText.text = "Now drag onto the left eye";
+        messageText.text = "Now drag onto the right eye";
         SetActiveHand(true);
         handRT.GetComponent<Animation>().enabled = false;
         handRT.GetChild(0).GetComponent<RectTransform>().sizeDelta = handRT.GetChild(1).GetComponent<RectTransform>().sizeDelta = new Vector2(250, 250);
@@ -259,7 +266,7 @@ public class UserTutorialController : MonoBehaviour
         handRT.localEulerAngles = new(0, 0, 25);
     }
 
-    private void ShowPupilTutorial()
+    private void ShowPatternTutorial()
     {
         messageText.text = "Select and tune pattern";
         SetHand(true);
@@ -274,9 +281,9 @@ public class UserTutorialController : MonoBehaviour
         handRT.GetChild(1).gameObject.SetActive(isDown);
     }
 
-    internal IEnumerator SetHandAnimForLens(Vector3 startPos, Vector3 endPos)
+    internal IEnumerator SetHandAnimForLens(Transform startPosTR, Vector3 endPos)
     {
-        handRT.position = startPos;
+        handRT.position = startPosTR.position;
     Anim:
         SetHand(false);
         yield return new WaitForSeconds(0.1f);
@@ -286,7 +293,7 @@ public class UserTutorialController : MonoBehaviour
         yield return new WaitForSeconds(1.1f);
         SetHand(false);
         yield return new WaitForSeconds(0.1f);
-        handRT.DOMove(startPos, 1f);
+        handRT.DOMove(startPosTR.position, 1f);
         yield return new WaitForSeconds(1f);
         goto Anim;
     }

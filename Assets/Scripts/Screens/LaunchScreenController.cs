@@ -24,7 +24,7 @@ public class LaunchScreenController : MonoBehaviour
             GameManager.Inst.Show_Screen(GameManager.Screens.Home);
             if (!isCompleted)
             {
-                AdsManager.Inst.RequestNativeAd();
+                AdsManager.Inst.RequestBannerAd(false);
                 SoundManager.Inst.Play("BackgroundMusic", true);
                 isCompleted = true;
             }

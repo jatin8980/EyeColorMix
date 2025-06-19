@@ -30,8 +30,8 @@ public class HighlightController : MonoBehaviour
 
         if (selectedHighlightIndex == -1)
             selectedHighlightIndex = GeneralDataManager.Inst.orderToShowHighlights[0];
-
-        rt.DOAnchorPosY(AdsManager.Inst.isNativeAdLoaded ? 565f : 395f, 0.3f).OnComplete(() =>
+        float y = AdsManager.Inst.isBannerLoaded ? 395f + GameManager.Inst.bannerHeight : 395f;
+        rt.DOAnchorPosY(y, 0.3f).OnComplete(() =>
         {
             if (UserTutorialController.Inst != null)
             {
@@ -40,13 +40,12 @@ public class HighlightController : MonoBehaviour
                 UserTutorialController.Inst.handRT.anchoredPosition += new Vector2(110, 0);
             }
         });
+        GameManager.Inst.gamePlayUi.nextBtnParentRT.anchoredPosition = new Vector2(0, y + 100);
 
         if (UserTutorialController.Inst == null)
             GameManager.Inst.gamePlayUi.RefreshHighlight(selectedHighlightIndex);
         else
         {
-            UserTutorialController.Inst.SetActiveHand(true);
-            UserTutorialController.Inst.handRT.position = contentRT.GetChild(1).position;
             selectedHighlightIndex = -1;
             return;
         }
@@ -72,31 +71,19 @@ public class HighlightController : MonoBehaviour
         }
     }
 
-    internal void RefreshForNativeAd()
+    internal void RefreshForAd()
     {
         RectTransform rt = GetComponent<RectTransform>();
         rt.DOKill();
-        if (AdsManager.Inst.isNativeAdLoaded)
+        float y = AdsManager.Inst.isBannerLoaded ? 395f + GameManager.Inst.bannerHeight : 395f;
+        rt.DOAnchorPosY(y, 0.2f).OnComplete(() =>
         {
-            rt.DOAnchorPosY(565f, 0.2f).OnComplete(() =>
+            if (UserTutorialController.Inst != null)
             {
-                if (UserTutorialController.Inst != null)
-                {
-                    UserTutorialController.Inst.handRT.position = contentRT.GetChild(2).position;
-                    UserTutorialController.Inst.handRT.anchoredPosition += new Vector2(110, 0);
-                }
-            });
-        }
-        else
-        {
-            rt.DOAnchorPosY(395f, 0.2f).OnComplete(() =>
-            {
-                if (UserTutorialController.Inst != null)
-                {
-                    UserTutorialController.Inst.handRT.position = contentRT.GetChild(2).position;
-                    UserTutorialController.Inst.handRT.anchoredPosition += new Vector2(110, 0);
-                }
-            });
-        }
+                UserTutorialController.Inst.handRT.position = contentRT.GetChild(2).position;
+                UserTutorialController.Inst.handRT.anchoredPosition += new Vector2(110, 0);
+            }
+        });
+        GameManager.Inst.gamePlayUi.nextBtnParentRT.anchoredPosition = new Vector2(0, y + 100);
     }
 }

@@ -18,7 +18,7 @@ public class GalleryItem : MonoBehaviour
     {
         this.index = index;
         Texture2D tex = new Texture2D(0, 0);
-        tex.LoadImage(File.ReadAllBytes(Application.persistentDataPath + "/Eyes/" + (index + 1) + ".png"));
+        tex.LoadImage(File.ReadAllBytes(Application.persistentDataPath + "/.Eyes/" + (index + 1) + ".png"));
         icon.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new(0.5f, 0.5f));
         bodyImage.sprite = GalleryPopUp.Inst.rightEyes[GalleryPopUp.Inst.listOfCharacterPlayedInLevel[index]];
         bodyRT.sizeDelta = GalleryPopUp.Inst.characterSizes[GalleryPopUp.Inst.listOfCharacterPlayedInLevel[index]];
@@ -28,6 +28,6 @@ public class GalleryItem : MonoBehaviour
     public void On_Btn_Click()
     {
         GameManager.Inst.Show_Popup(GameManager.Popups.GalleryDetailPopUp, false);
-        FindObjectOfType<GalleryDetailPopUp>().SetThis(icon.sprite, index);
+        FindAnyObjectByType<GalleryDetailPopUp>().SetThis(icon.sprite, index);
     }
 }
