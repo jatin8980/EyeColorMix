@@ -11,7 +11,7 @@ public class GeneralDataManager : MonoBehaviour
     public bool testMode;
     internal static GeneralDataManager Inst;
     internal static string androidShareLink = "https://play.google.com/store/apps/details?id=",
-                            iPhoneShareLink = "itms-apps://itunes.apple.com/app/id6739959573";
+                            iPhoneShareLink = "itms-apps://itunes.apple.com/app/id";
     internal int[] levelNeededToUnlockPupil = { 0, 0, 0, -1, 3, 3, -1, 5, -1, 5, -1, 7, 10, 13, -1, 17, 21, 26, 31, -1, 37, -1, 43, 50, 57, 64, -1, 71, -1, 78, 85, 92, 99, -1, 113, 127, 141, 155, -1, 162, 169, 176, 183, -1, 190, 197 },
         levelNeededToUnlockPattern = { 0, 0, 0, -1, 7, -1, -1, 10, 13, 17, -1, 26, -1, 37, 50, 64, 78, -1, 92, -1, 106, 120, 134, 148, -1 },
         levelNeededToUnlockEffect = { 0, 0, 0, 7, 13, 21, 31, 43, 50, 57, 64 },
@@ -23,9 +23,7 @@ public class GeneralDataManager : MonoBehaviour
         orderToShowHighlights = new() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49 };
 
     internal List<ColorDetail> colorDetails = new();
-    internal string ShareMessage = "Unleash your creativity and color the world! 🎮In this mind-bending game, mix and match lenses of all colors to customize character’s eyes!" +
-                      "\n\nAndroid : " + androidShareLink +
-                     "\n\nIPhone : " + iPhoneShareLink;
+    internal string ShareMessage = "";
 
     internal App_Detail app_Detail = new App_Detail();
 
@@ -154,6 +152,11 @@ public class GeneralDataManager : MonoBehaviour
         if (app_Detail == null) app_Detail = new App_Detail();
         iPhoneShareLink = "itms-apps://itunes.apple.com/app/id" + app_Detail.iPhoneID;
         androidShareLink = "https://play.google.com/store/apps/details?id=" + app_Detail.AndroidID;
+
+        ShareMessage = "Unleash your creativity and color the world! 🎮In this mind-bending game, mix and match lenses of all colors to customize character’s eyes! It's Free..." +
+                      "\n\nAndroid : " + androidShareLink +
+                     "\n\nIPhone : " + iPhoneShareLink;
+
 
         Invoke(nameof(LoadColorNames), 3f);
     }

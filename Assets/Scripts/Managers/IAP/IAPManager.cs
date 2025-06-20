@@ -152,17 +152,19 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener
 
         if (iAPPurchasedItem.rewards.ContainsKey("removeads"))
         {
-            GeneralDataManager.IsPurchaseAdsRemoved = true;
+            IsPurchaseAdsRemoved = true;
             AdsManager.Inst.RemoveAdsApply();
             GameManager.Inst.homeScreen.RefreshRemoveAdsBtn();
             StorePopUp.Inst.RefreshRemoveAdsOb();
             yield return new WaitForSeconds(0.1f);
-            GameManager.Inst.Show_Toast("Ads Removed Successfully.");
+            GameManager.Inst.Show_Toast("Ads Removed Successfully!");
         }
         else if (iAPPurchasedItem.rewards.ContainsKey("coin"))
         {
-            GeneralDataManager.Coins += iAPPurchasedItem.rewards["coin"];
+            Coins += iAPPurchasedItem.rewards["coin"];
             GameManager.Inst.StartCoroutine(StorePopUp.Inst.CollectCoins(iAPSavedDataDictonary.Keys.ToList().IndexOf(productID) + 1));
+            yield return new WaitForSeconds(0.1f);
+            GameManager.Inst.Show_Toast(iAPPurchasedItem.packName + " Purchased!");
         }
     }
 
@@ -247,8 +249,7 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener
             {
                 for (var i = 0; i < productIDs.Count; i++)
                 {
-                    iAPSavedDataDictonary.ElementAt(i).Value.price =
-                        GetProductInformation(productIDs[i]).metadata.localizedPriceString;
+                    iAPSavedDataDictonary.ElementAt(i).Value.price = GetProductInformation(productIDs[i]).metadata.localizedPrice != 0 ? GetProductInformation(productIDs[i]).metadata.localizedPriceString : iAPSavedDataDictonary.ElementAt(i).Value.price;
                 }
             }
             Shop_Saved_Data = JsonConvert.SerializeObject(iAPSavedDataDictonary);

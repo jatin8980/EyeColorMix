@@ -1,26 +1,26 @@
 {
-    "coinspack1": {
-        "price": "$3.99",
+    "poder.eyecolormixing.coinspack1": {
+        "price": "$0.99",
         "packName": "Hot Pack",
         "rewards": {
-            "coin": 1320
+            "coin": 1000
         }
     },
-    "coinspack2": {
-        "price": "$7.99",
+    "poder.eyecolormixing.coinspack2": {
+        "price": "$1.99",
         "packName": "Super Pack",
         "rewards": {
-            "coin": 2880
+            "coin": 2500
         }
     },
-      "coinspack3": {
-        "price": "$12.99",
+    "poder.eyecolormixing.coinspack3": {
+        "price": "$2.99",
         "packName": "Mega Pack",
         "rewards": {
-            "coin": 6240
+            "coin": 6000
         }
     },
-    "eyecolormix.removeads": {
+    "poder.eyecolormixing.removeads": {
         "price": "$4.99",
         "packName": "Null",
         "rewards": {

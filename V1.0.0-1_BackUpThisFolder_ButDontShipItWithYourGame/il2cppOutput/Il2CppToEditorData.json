@@ -1,0 +1,81 @@
+{
+  "Messages": [
+    {
+      "Type": 0,
+      "Text": "[Unity.TextMeshPro] - System.Void TMPro.TextMeshPro::GenerateTextMesh() - Method was given it\u0027s own cpp file because it is large and costly to compile"
+    },
+    {
+      "Type": 0,
+      "Text": "[Unity.TextMeshPro] - System.Void TMPro.TextMeshProUGUI::GenerateTextMesh() - Method was given it\u0027s own cpp file because it is large and costly to compile"
+    },
+    {
+      "Type": 0,
+      "Text": "[Unity.TextMeshPro] - System.Void TMPro.TMP_TextParsingUtilities::.cctor() - Method was given it\u0027s own cpp file because it is large and costly to compile"
+    },
+    {
+      "Type": 0,
+      "Text": "[mscorlib] - System.Void System.Security.Cryptography.RIPEMD160Managed::MDTransform(System.UInt32*,System.UInt32*,System.Byte*) - High Instruction Count of 5579"
+    },
+    {
+      "Type": 0,
+      "Text": "[Unity.TextMeshPro] - System.Void TMPro.TextMeshPro::GenerateTextMesh() - High Variable Count of 216"
+    },
+    {
+      "Type": 0,
+      "Text": "[Unity.TextMeshPro] - System.Void TMPro.TextMeshPro::GenerateTextMesh() - High Instruction Count of 9702"
+    },
+    {
+      "Type": 0,
+      "Text": "[Unity.TextMeshPro] - System.Void TMPro.TextMeshPro::GenerateTextMesh() - High CodeSize of 29806"
+    },
+    {
+      "Type": 0,
+      "Text": "[Unity.TextMeshPro] - System.Void TMPro.TextMeshProUGUI::GenerateTextMesh() - High Variable Count of 221"
+    },
+    {
+      "Type": 0,
+      "Text": "[Unity.TextMeshPro] - System.Void TMPro.TextMeshProUGUI::GenerateTextMesh() - High Instruction Count of 9793"
+    },
+    {
+      "Type": 0,
+      "Text": "[Unity.TextMeshPro] - System.Void TMPro.TextMeshProUGUI::GenerateTextMesh() - High CodeSize of 30085"
+    },
+    {
+      "Type": 0,
+      "Text": "[Unity.TextMeshPro] - System.Void TMPro.TMP_TextParsingUtilities::.cctor() - High Instruction Count of 10579"
+    },
+    {
+      "Type": 0,
+      "Text": "[Unity.TextMeshPro] - System.Void TMPro.TMP_TextParsingUtilities::.cctor() - High CodeSize of 31711"
+    },
+    {
+      "Type": 0,
+      "Text": "[UnityEngine.TextCoreTextEngineModule] - System.Boolean UnityEngine.TextCore.Text.TextGenerator::ValidateHtmlTag(UnityEngine.TextCore.Text.TextProcessingElement[],System.Int32,System.Int32\u0026,UnityEngine.TextCore.Text.TextGenerationSettings,UnityEngine.TextCore.Text.TextInfo,System.Boolean\u0026) - High Variable Count of 249"
+    },
+    {
+      "Type": 0,
+      "Text": "[UnityEngine.TextCoreTextEngineModule] - System.Boolean UnityEngine.TextCore.Text.TextGenerator::ValidateHtmlTag(UnityEngine.TextCore.Text.TextProcessingElement[],System.Int32,System.Int32\u0026,UnityEngine.TextCore.Text.TextGenerationSettings,UnityEngine.TextCore.Text.TextInfo,System.Boolean\u0026) - High Instruction Count of 6204"
+    },
+    {
+      "Type": 0,
+      "Text": "[UnityEngine.TextCoreTextEngineModule] - System.Boolean UnityEngine.TextCore.Text.TextGenerator::ValidateHtmlTag(UnityEngine.TextCore.Text.TextProcessingElement[],System.Int32,System.Int32\u0026,UnityEngine.TextCore.Text.TextGenerationSettings,UnityEngine.TextCore.Text.TextInfo,System.Boolean\u0026) - High CodeSize of 17515"
+    },
+    {
+      "Type": 0,
+      "Text": "[UnityEngine.TextCoreTextEngineModule] - System.Void UnityEngine.TextCore.Text.TextGenerator::ParsingPhase(UnityEngine.TextCore.Text.TextInfo,UnityEngine.TextCore.Text.TextGenerationSettings,System.UInt32\u0026,System.Single\u0026) - High Variable Count of 301"
+    },
+    {
+      "Type": 0,
+      "Text": "[UnityEngine.TextCoreTextEngineModule] - System.Void UnityEngine.TextCore.Text.TextGenerator::ParsingPhase(UnityEngine.TextCore.Text.TextInfo,UnityEngine.TextCore.Text.TextGenerationSettings,System.UInt32\u0026,System.Single\u0026) - High Instruction Count of 5814"
+    },
+    {
+      "Type": 0,
+      "Text": "[UnityEngine.TextCoreTextEngineModule] - System.Void UnityEngine.TextCore.Text.TextGenerator::ParsingPhase(UnityEngine.TextCore.Text.TextInfo,UnityEngine.TextCore.Text.TextGenerationSettings,System.UInt32\u0026,System.Single\u0026) - High CodeSize of 15128"
+    },
+    {
+      "Type": 0,
+      "Text": "[UnityEngine.TextCoreTextEngineModule] - UnityEngine.Vector2 UnityEngine.TextCore.Text.TextGenerator::CalculatePreferredValues(System.Single\u0026,UnityEngine.Vector2,System.Boolean,UnityEngine.TextCore.Text.TextGenerationSettings,UnityEngine.TextCore.Text.TextInfo) - High Variable Count of 208"
+    }
+  ],
+  "CommandLine": "--convert-to-cpp --assembly=Library/Bee/artifacts/Android/ManagedStripped/Assembly-CSharp.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/DOTween.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/DOTweenPro.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/GoogleMobileAds.Android.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/GoogleMobileAds.Common.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/GoogleMobileAds.Core.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/GoogleMobileAds.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/GoogleMobileAds.Ump.Android.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/GoogleMobileAds.Ump.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/Mono.Security.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/mscorlib.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/NativeGallery.Runtime.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/NativeShare.Runtime.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/Newtonsoft.Json.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/Purchasing.Common.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/System.Configuration.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/System.Core.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/System.Data.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/System.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/System.Drawing.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/System.Numerics.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/System.Runtime.Serialization.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/System.Xml.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/System.Xml.Linq.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/Unity.2D.Animation.Runtime.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/Unity.Burst.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/Unity.Burst.Unsafe.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/Unity.Collections.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/Unity.Collections.LowLevel.ILSupport.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/Unity.InternalAPIEngineBridge.001.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/Unity.Mathematics.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/Unity.Notifications.Android.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/Unity.Services.Core.Configuration.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/Unity.Services.Core.Device.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/Unity.Services.Core.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/Unity.Services.Core.Environments.Internal.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/Unity.Services.Core.Internal.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/Unity.Services.Core.Registration.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/Unity.Services.Core.Scheduler.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/Unity.Services.Core.Telemetry.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/Unity.Services.Core.Threading.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/Unity.TextMeshPro.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/Unity.VisualScripting.Core.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.Advertisements.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.AIModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.AndroidJNIModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.AnimationModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.AudioModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.CoreModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.GridModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.HierarchyCoreModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.ImageConversionModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.IMGUIModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.InputForUIModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.InputLegacyModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.JSONSerializeModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.ParticleSystemModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.Physics2DModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.PhysicsModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.PropertiesModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.Purchasing.AppleCore.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.Purchasing.AppleMacosStub.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.Purchasing.AppleStub.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.Purchasing.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.Purchasing.Security.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.Purchasing.SecurityCore.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.Purchasing.Stores.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.Purchasing.WinRTCore.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.Purchasing.WinRTStub.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.SharedInternalsModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.SpriteMaskModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.SpriteShapeModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.TextCoreFontEngineModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.TextCoreTextEngineModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.TextRenderingModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.TilemapModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.UI.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.UIElementsModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.UIModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.UnityAnalyticsCommonModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.UnityAnalyticsModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.UnityWebRequestModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.UnityWebRequestTextureModule.dll --assembly=Library/Bee/artifacts/Android/ManagedStripped/Vibration.dll --generatedcppdir=/Users/jatinmaniya/Desktop/MainProject/_PoderStudio/EyeColorMixing/EyeColorMixingProject/Library/Bee/artifacts/Android/il2cppOutput/cpp --symbols-folder=/Users/jatinmaniya/Desktop/MainProject/_PoderStudio/EyeColorMixing/EyeColorMixingProject/Library/Bee/artifacts/Android/il2cppOutput/cpp/Symbols --additional-cpp=/Users/jatinmaniya/Desktop/MainProject/_PoderStudio/EyeColorMixing/EyeColorMixingProject/Library/PackageCache/com.unity.ads@3bb3d269d51b/Plugins/iOS/UnityAdsShowListener.h --additional-cpp=/Users/jatinmaniya/Desktop/MainProject/_PoderStudio/EyeColorMixing/EyeColorMixingProject/Library/PackageCache/com.benoitfreslon.vibration@0fe3ea18d228/Vibration/Plugins/iOS/Vibration/Vibration.h --additional-cpp=/Users/jatinmaniya/Desktop/MainProject/_PoderStudio/EyeColorMixing/EyeColorMixingProject/Library/PackageCache/com.unity.ads.ios-support@487ecc811415/Runtime/Plugins/iOS/SkAdNetworkManager.h --additional-cpp=/Users/jatinmaniya/Desktop/MainProject/_PoderStudio/EyeColorMixing/EyeColorMixingProject/Library/PackageCache/com.unity.ads@3bb3d269d51b/Plugins/iOS/UnityAdsInitializationListener.h --additional-cpp=/Users/jatinmaniya/Desktop/MainProject/_PoderStudio/EyeColorMixing/EyeColorMixingProject/Library/PackageCache/com.unity.ads.ios-support@487ecc811415/Runtime/Plugins/iOS/TrackingAuthorizationManager.h --additional-cpp=/Users/jatinmaniya/Desktop/MainProject/_PoderStudio/EyeColorMixing/EyeColorMixingProject/Library/PackageCache/com.unity.ads@3bb3d269d51b/Plugins/iOS/UnityAdsLoadListener.h --enable-analytics --emit-null-checks --enable-array-bounds-check --dotnetprofile=unityaot-linux --usymtool-path=/Applications/Unity/Hub/Editor/6000.1.3f1/Unity.app/Contents/Tools/macosx/usymtool --profiler-report --profiler-output-file=/Users/jatinmaniya/Desktop/MainProject/_PoderStudio/EyeColorMixing/EyeColorMixingProject/Library/Bee/artifacts/il2cpp_conv_7rm2.traceevents --print-command-line --static-lib-il2-cpp --data-folder=/Users/jatinmaniya/Desktop/MainProject/_PoderStudio/EyeColorMixing/EyeColorMixingProject/Library/Bee/artifacts/Android/il2cppOutput/data --emit-source-mapping"
+}

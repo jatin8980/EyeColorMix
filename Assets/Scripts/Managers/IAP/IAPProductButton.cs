@@ -6,7 +6,7 @@ using System;
 
 public class IAPProductButton : MonoBehaviour
 {
-    public TextMeshProUGUI titleText/*, oldPriceText, offerNameText*/;
+    public TextMeshProUGUI titleText;
     [SerializeField] private Text priceText;
     //Je rite file ma reward ni index set kari 6 te rite karvi.
     [Header("Put text here in same order of data.")]

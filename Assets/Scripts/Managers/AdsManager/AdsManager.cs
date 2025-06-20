@@ -11,21 +11,21 @@ public class AdsManager : SingletonComponent<AdsManager>
     internal bool isBannerLoaded = false;
     //Android Ids.
     // androidAppID = ca-app-pub-2981087280704608~2965667585
-    string androidBannerID = "",
+    string androidBannerID = "ca-app-pub-2981087280704608/7209517934",
            androidRewardVideoID = "ca-app-pub-2981087280704608/1288789687",
            androidInterstitialID = "ca-app-pub-2981087280704608/2518110873",
            splashAndroidInterstitialID = "ca-app-pub-2981087280704608/2518110873",
-           _androidAppOpenID = "",
-           _androidRewardInterstitialID = "";
+           _androidAppOpenID = "ca-app-pub-2981087280704608/9448684379",
+           _androidRewardInterstitialID = "ca-app-pub-2981087280704608/9495951685";
 
     //IPhone Ids.
     //iosAppID = ca-app-pub-3583215259954966~9694727467  
-    string iosBannerID = "",
+    string iosBannerID = "ca-app-pub-3583215259954966/8784106445",
            iosRewardVideoID = "ca-app-pub-3583215259954966/2792339397",
            iosInterstitialID = "ca-app-pub-3583215259954966/7387294175",
            splashIOSInterstitialID = "ca-app-pub-3583215259954966/7387294175",
-           _iosAppOpenID = "",
-           _iosRewardInterstitialID = "";
+           _iosAppOpenID = "ca-app-pub-3583215259954966/8592534751",
+           _iosRewardInterstitialID = "ca-app-pub-3583215259954966/6655000072";
 
     private string bannerID = "", rewardVideoID = "", interstitialID = "", splashInterstitialID = "", _appOpenId, _rewardInterstitialId;
 

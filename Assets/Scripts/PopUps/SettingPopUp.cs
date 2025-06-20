@@ -63,7 +63,7 @@ public class SettingPopUp : MonoBehaviour
     public void On_Privacy_Button_Click()
     {
         Application.OpenURL(Application.platform == RuntimePlatform.Android ?
-                   "" :
+                   GeneralDataManager.Inst.app_Detail.Privacy :
                    "https://sites.google.com/view/easyfungames/policy");
     }
 
@@ -82,7 +82,7 @@ public class SettingPopUp : MonoBehaviour
     #region  Functions
     private static void SendEmail()
     {
-        string email = Application.platform == RuntimePlatform.Android ? "" : "morefun.connect@gmail.com";
+        string email = Application.platform == RuntimePlatform.Android ? GeneralDataManager.Inst.app_Detail.Mail : "morefun.connect@gmail.com";
         var subject = MyEscapeURL(Application.productName + " " + Application.platform + " Support V" + Application.version);
         var body = MyEscapeURL("");
         Application.OpenURL("mailto:" + email + "?subject=" + subject + "&body=" + body);
@@ -109,7 +109,7 @@ public class SettingPopUp : MonoBehaviour
         var chooser = intentClass.CallStatic<AndroidJavaObject>("createChooser", intentObject, "Share your high score");
         currentActivity.Call("startActivity", chooser);
 #elif UNITY_IOS
-            NativeShare.Share(GeneralDataManager.Inst.ShareMessage);
+        new NativeShareLink().SetText(GeneralDataManager.Inst.ShareMessage).Share();
 #endif
     }
     #endregion

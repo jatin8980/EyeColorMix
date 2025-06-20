@@ -4,13 +4,13 @@ using UnityEngine.Advertisements;
 public class UnityAdsManager : SingletonComponent<UnityAdsManager>, IUnityAdsInitializationListener
 {
     //Android Ids.
-    string androidAppID = "5809747",
+    string androidAppID = "5811841",
         androidBannerID = "Banner_Android",
         androidInterstitialID = "Interstitial_Android",
         androidRewardVideoID = "Rewarded_Android";
 
     //IPhone Ids.
-    string iosAppID = "5809746",
+    string iosAppID = "5811840",
         iosBannerID = "Banner_iOS",
         iosInterstitialID = "Interstitial_iOS",
         iosRewardVideoID = "Rewarded_iOS";
